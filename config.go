@@ -1,17 +1,25 @@
 package member
 
-import "gorm.io/gorm"
+import (
+	"github.com/spurtcms/auth"
+	role "github.com/spurtcms/team-roles"
+	"gorm.io/gorm"
+)
 
 type Config struct {
-	Auth       bool
-	Permission bool
-	DB         *gorm.DB
+	AuthEnable       bool
+	PermissionEnable bool
+	DB               *gorm.DB
+	Auth             *auth.Auth
+	Permissions      *role.PermissionConfig
 }
 
 type Member struct {
-	Auth          bool
-	Permission    bool
-	AuthFlg       bool
-	PermissionFlg bool
-	DBString      *gorm.DB
+	AuthEnable       bool
+	PermissionEnable bool
+	AuthFlg          bool
+	PermissionFlg    bool
+	DB               *gorm.DB
+	Auth             *auth.Auth
+	Permissions      *role.PermissionConfig
 }

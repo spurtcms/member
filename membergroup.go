@@ -1,7 +1,7 @@
 package member
 
 import (
-	"errors"
+	"strings"
 	"time"
 )
 
@@ -52,35 +52,16 @@ type tblmembergroup struct {
 
 // Function ListMemberGroup pass the arguments of limit,offset and filter (eg. keywords)
 // It will return the all membergroup lists
-func (member *Member) ListMemberGroup(offset, limit int, filter Filter) (membergroup []tblmembergroup, MemberGroupCount int64, err error) {
+func (member *Member) ListMemberGroup(listreq MemberGroupListReq) (membergroup []tblmembergroup, MemberGroupCount int64, err error) {
 
-	if member.Auth {
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
-		if member.Permission {
-
-			member.PermissionFlg = true
-
-			return []tblmembergroup{}, 0, errors.New("unauthorized")
-		}
-
-		member.AuthFlg = true
-
-		return []tblmembergroup{}, 0, errors.New("invalid Token")
-
-	} else if member.Permission {
-
-		member.PermissionFlg = true
-
-		return []tblmembergroup{}, 0, errors.New("unauthorized")
+		return []tblmembergroup{}, 0, AuthErr
 	}
 
-	var membergrplist []tblmembergroup
+	_, membercounts, _ := Membermodel.MemberGroupList(listreq, member.DB)
 
-	MemberGroupList(membergrplist, limit, offset, filter, false, member.DBString)
-
-	_, membercounts, _ := MemberGroupList(membergrplist, limit, offset, filter, false, member.DBString)
-
-	membergrouplist, _, _ := MemberGroupList(membergrplist, limit, offset, filter, false, member.DBString)
+	membergrouplist, _, _ := Membermodel.MemberGroupList(listreq, member.DB)
 
 	var membergrouplists []tblmembergroup
 
@@ -101,4 +82,41 @@ func (member *Member) ListMemberGroup(offset, limit int, filter Filter) (memberg
 
 	return membergrouplists, membercounts, nil
 
+}
+
+/*Create Member Group*/
+func (member *Member) CreateMemberGroup(membergrpc MemberGroupCreation) error {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+
+		return AuthErr
+	}
+
+	if membergrpc.Name == "" {
+
+		return ErrorEmpty
+	}
+
+	var membergroup TblMemberGroup
+
+	membergroup.Name = membergrpc.Name
+
+	membergroup.Slug = strings.ToLower(membergrpc.Name)
+
+	membergroup.Description = membergrpc.Description
+
+	membergroup.CreatedBy = membergrpc.CreatedBy
+
+	membergroup.IsActive = 1
+
+	membergroup.CreatedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	err := Membermodel.MemberGroupCreate(&membergroup, member.DB)
+
+	if err != nil {
+
+		return err
+	}
+
+	return nil
 }

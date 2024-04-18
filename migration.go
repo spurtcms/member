@@ -106,4 +106,5 @@ func MigrateTables(db *gorm.DB) {
     TABLESPACE pg_default
     WHERE is_deleted = 0;`)
 
+	
 }
