@@ -54,14 +54,16 @@ type tblmembergroup struct {
 // It will return the all membergroup lists
 func (member *Member) ListMemberGroup(listreq MemberGroupListReq) (membergroup []tblmembergroup, MemberGroupCount int64, err error) {
 
-	if AuthErr := AuthandPermission(member); AuthErr != nil {
+	AuthErr := AuthandPermission(member)
+
+	if AuthErr != nil {
 
 		return []tblmembergroup{}, 0, AuthErr
 	}
 
-	_, membercounts, _ := Membermodel.MemberGroupList(listreq, member.DB)
+	_, membercounts,  _:= Membermodel.MemberGroupList(MemberGroupListReq{Limit: 0,Offset: 0,Keyword: listreq.Keyword,ActiveGroupsOnly: listreq.ActiveGroupsOnly}, member.DB)
 
-	membergrouplist, _, _ := Membermodel.MemberGroupList(listreq, member.DB)
+	membergrouplist, _,_  := Membermodel.MemberGroupList(listreq, member.DB)
 
 	var membergrouplists []tblmembergroup
 
