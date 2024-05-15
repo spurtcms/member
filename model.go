@@ -62,6 +62,14 @@ type memberprofilecreationUpdation struct {
 	ModifiedBy      int
 }
 
+type MemberGroupCreationUpdation struct {
+	Name        string
+	Description string
+	CreatedBy   int
+	ModifiedBy  int
+	IsActive    int
+}
+
 // soft delete check
 func IsDeleted(db *gorm.DB) *gorm.DB {
 	return db.Where("is_deleted = 0")
@@ -284,4 +292,26 @@ func (membermodel MemberModel) CheckNameInMember(userid int, name string, DB *go
 	}
 
 	return member, nil
+}
+
+// Member Group Update
+func (membermodel MemberModel) MemberGroupUpdate(membergroup *tblmembergroup, id int, DB *gorm.DB) error {
+
+	if err := DB.Model(TblMemberGroup{}).Where("id=?", id).Updates(TblMemberGroup{Name: membergroup.Name, Slug: membergroup.Slug, Description: membergroup.Description, Id: membergroup.Id, ModifiedOn: membergroup.ModifiedOn, ModifiedBy: membergroup.ModifiedBy}).Error; err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+// Member Group Delete
+func (membermodel MemberModel) DeleteMemberGroup(membergroup *tblmembergroup, id int, DB *gorm.DB) error {
+
+	if err := DB.Debug().Model(TblMemberGroup{}).Where("id=?", id).UpdateColumns(map[string]interface{}{"is_deleted": 1, "modified_by": membergroup.ModifiedBy}).Error; err != nil {
+
+		return err
+
+	}
+	return nil
 }

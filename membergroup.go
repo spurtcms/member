@@ -122,3 +122,64 @@ func (member *Member) CreateMemberGroup(membergrpc MemberGroupCreation) error {
 
 	return nil
 }
+
+/*Update Member Group*/
+func (member *Member) UpdateMemberGroup(membergrpc MemberGroupCreationUpdation,id int) error {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+
+		return AuthErr
+	}
+
+	if membergrpc.Name == "" {
+
+		return ErrorEmpty
+	}
+
+	var membergroup tblmembergroup
+
+	membergroup.Id = id
+
+	membergroup.Name = membergrpc.Name
+
+	membergroup.Slug = strings.ToLower(membergrpc.Name)
+
+	membergroup.Description = membergrpc.Description
+
+	membergroup.ModifiedBy = membergrpc.ModifiedBy
+
+	membergroup.IsActive = membergrpc.IsActive
+
+	membergroup.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	err := Membermodel.MemberGroupUpdate(&membergroup,id, member.DB)
+
+	if err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+// delete member
+func (member *Member) DeleteMemberGroup(id int, modifiedBy int) error {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+
+		return AuthErr
+	}
+
+	var tblmembergroup tblmembergroup
+
+	tblmembergroup.ModifiedBy = modifiedBy
+
+	err := Membermodel.DeleteMemberGroup(&tblmembergroup, id, member.DB)
+
+	if err != nil {
+
+		return err
+	}
+
+	return nil
+}
