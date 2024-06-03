@@ -34,7 +34,7 @@ type Tblmember struct {
 	ModifiedDate     string    `gorm:"-"`
 	NameString       string    `gorm:"-"`
 	LoginTime        time.Time `gorm:"DEFAULT:NULL"`
-	Token            string
+	Token            string    `gorm:"-"`
 }
 
 type Tblmembergroup struct {
@@ -281,7 +281,7 @@ func (member *Member) MultiSelectMembersgroupStatus(memberid []int, status int, 
 
 		return false, AuthErr
 	}
-	
+
 	var memberstatus TblMemberGroup
 
 	memberstatus.ModifiedBy = modifiedby
