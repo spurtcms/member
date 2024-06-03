@@ -198,9 +198,7 @@ func (member *Member) CreateMemberProfile(Mc MemberprofilecreationUpdation) erro
 
 	var memberprof TblMemberProfile
 
-	memberprof.MemberId = Mc.ProfileId
-
-	memberprof.Id = Mc.ProfileId
+	memberprof.MemberId = Mc.MemberId
 
 	memberprof.CompanyName = Mc.CompanyName
 
@@ -222,11 +220,11 @@ func (member *Member) CreateMemberProfile(Mc MemberprofilecreationUpdation) erro
 
 	memberprof.ClaimStatus = Mc.ClaimStatus
 
-	memberprof.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+	memberprof.CreatedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 
-	memberprof.ModifiedBy = Mc.ModifiedBy
+	memberprof.CreatedBy = Mc.ModifiedBy
 
-	err2 := Membermodel.MemberprofileUpdate(&memberprof, Mc.ProfileId, member.DB)
+	err2 := Membermodel.CreateMemberProfile(&memberprof,member.DB)
 
 	if err2 != nil {
 
@@ -235,6 +233,7 @@ func (member *Member) CreateMemberProfile(Mc MemberprofilecreationUpdation) erro
 
 	return nil
 }
+
 
 // update memberprofile
 func (member *Member) UpdateMemberProfile(Mc MemberprofilecreationUpdation) error {
