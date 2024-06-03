@@ -189,7 +189,7 @@ func (member *Member) UpdateMember(Mc MemberCreationUpdation, id int) error {
 }
 
 // create member profile
-func (member *Member) CreateMemberProfile(Mc memberprofilecreationUpdation) error {
+func (member *Member) CreateMemberProfile(Mc MemberprofilecreationUpdation) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -237,7 +237,7 @@ func (member *Member) CreateMemberProfile(Mc memberprofilecreationUpdation) erro
 }
 
 // update memberprofile
-func (member *Member) UpdateMemberProfile(Mc memberprofilecreationUpdation) error {
+func (member *Member) UpdateMemberProfile(Mc MemberprofilecreationUpdation) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 

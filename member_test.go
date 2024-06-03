@@ -176,7 +176,7 @@ func TestCreateMemberProfile(t *testing.T) {
 	})
 	if permisison {
 
-		err := member.CreateMemberProfile(memberprofilecreationUpdation{MemberId: 1,ProfileId: 5,CompanyName: "CMN",})
+		err := member.CreateMemberProfile(MemberprofilecreationUpdation{MemberId: 1,ProfileId: 5,CompanyName: "CMN",})
 
 		if err != nil {
 
@@ -221,7 +221,7 @@ func TestUpdateMemberProfile(t *testing.T) {
 	})
 	if permisison {
 
-		err := member.UpdateMemberProfile(memberprofilecreationUpdation{ProfileId: 5,CompanyName: "CMNs",})
+		err := member.UpdateMemberProfile(MemberprofilecreationUpdation{ProfileId: 5,CompanyName: "CMNs",})
 
 		if err != nil {
 

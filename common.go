@@ -20,7 +20,7 @@ func AuthandPermission(member *Member) error {
 		return ErrorAuth
 	}
 	//check permission enable if enabled, use team-role pkg otherwise it will return error
-	if member.PermissionEnable && !member.Permissions.PermissionFlg {
+	if member.PermissionEnable && !member.Auth.PermissionFlg {
 
 		return ErrorPermission
 

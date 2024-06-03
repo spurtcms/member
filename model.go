@@ -49,24 +49,6 @@ type MemberCreationUpdation struct {
 	GroupId          int
 }
 
-type memberprofilecreationUpdation struct {
-	MemberId        int
-	ProfileId       int
-	CompanyName     string
-	CompanyLocation string
-	CompanyLogo     string
-	ProfileName     string
-	ProfilePage     string
-	About           string
-	LinkedIn        string
-	Website         string
-	Twitter         string
-	ClaimStatus     int
-	ProfileSlug     string
-	CreatedBy       int
-	ModifiedBy      int
-}
-
 type MemberGroupCreationUpdation struct {
 	Name        string
 	Description string
@@ -105,10 +87,10 @@ type TblMemberGroup struct {
 	IsDeleted   int
 	CreatedOn   time.Time
 	CreatedBy   int
-	ModifiedOn  time.Time
-	ModifiedBy  int
-	DeletedOn   time.Time
-	DeletedBy   int
+	ModifiedOn  time.Time `gorm:"default:null"`
+	ModifiedBy  int       `gorm:"default:null"`
+	DeletedOn   time.Time `gorm:"default:null"`
+	DeletedBy   int       `gorm:"default:null"`
 }
 
 type TblMember struct {
@@ -129,12 +111,12 @@ type TblMember struct {
 	OtpExpiry        time.Time
 	LoginTime        time.Time
 	IsDeleted        int
-	DeletedOn        time.Time
-	DeletedBy        int
+	DeletedOn        time.Time `gorm:"default:null"`
+	DeletedBy        int       `gorm:"default:null"`
 	CreatedOn        time.Time
 	CreatedBy        int
-	ModifiedOn       time.Time
-	ModifiedBy       int
+	ModifiedOn       time.Time `gorm:"default:null"`
+	ModifiedBy       int       `gorm:"default:null"`
 }
 
 type TblMemberProfile struct {
@@ -164,19 +146,19 @@ type TblMemberProfile struct {
 }
 
 type TblMemberNotesHighlights struct {
-	Id                      int              
-	MemberId                int            
-	PageId                  int               
-	NotesHighlightsContent  string           
-	NotesHighlightsType     string          
-	HighlightsConfiguration datatypes.JSONMap 
-	CreatedBy               int               
-	CreatedOn               time.Time        
-	ModifiedBy              int             
-	ModifiedOn              time.Time        
-	DeletedBy               int             
-	DeletedOn               time.Time        
-	IsDeleted               int         
+	Id                      int
+	MemberId                int
+	PageId                  int
+	NotesHighlightsContent  string
+	NotesHighlightsType     string
+	HighlightsConfiguration datatypes.JSONMap
+	CreatedBy               int
+	CreatedOn               time.Time
+	ModifiedBy              int
+	ModifiedOn              time.Time
+	DeletedBy               int
+	DeletedOn               time.Time
+	IsDeleted               int
 }
 
 // soft delete check
