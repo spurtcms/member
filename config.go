@@ -6,11 +6,19 @@ import (
 	"gorm.io/gorm"
 )
 
+type Type string
+
+const (
+	Postgres Type = "postgres"
+	Mysql    Type = "mysql"
+)
+
 type Config struct {
 	AuthEnable       bool
 	PermissionEnable bool
 	DB               *gorm.DB
 	Auth             *auth.Auth
+	DataBaseType     Type
 	Permissions      *role.PermissionConfig
 }
 

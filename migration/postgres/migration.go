@@ -1,4 +1,5 @@
-package member
+package postgres
+
 
 import (
 	"time"
@@ -18,6 +19,8 @@ type TblMemberGroup struct {
 	CreatedBy   int       `gorm:"type:integer"`
 	ModifiedOn  time.Time `gorm:"type:timestamp without time zone;DEFAULT:NULL"`
 	ModifiedBy  int       `gorm:"DEFAULT:NULL"`
+	DeletedOn   time.Time `gorm:"type:timestamp without time zone;DEFAULT:NULL"`
+	DeletedBy   int       `gorm:"DEFAULT:NULL"`
 }
 
 type TblMember struct {
@@ -94,17 +97,4 @@ func MigrateTables(db *gorm.DB) {
 
 	db.AutoMigrate(&TblMemberGroup{}, &TblMember{}, &TblMemberNotesHighlights{}, &TblMemberProfile{})
 
-	db.Exec(`CREATE INDEX IF NOT EXISTS email_unique
-    ON public.tbl_members USING btree
-    (email COLLATE pg_catalog."default" ASC NULLS LAST)
-    TABLESPACE pg_default
-    WHERE is_deleted = 0;`)
-
-	db.Exec(`CREATE INDEX IF NOT EXISTS mobile_no_unique
-    ON public.tbl_members USING btree
-    (mobile_no COLLATE pg_catalog."default" ASC NULLS LAST)
-    TABLESPACE pg_default
-    WHERE is_deleted = 0;`)
-
-	
 }

@@ -4,13 +4,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
+	"github.com/spurtcms/member/migration"
 )
 
 // MemberSetup used initialize member configruation
 func MemberSetup(config Config) *Member {
 
-	MigrateTables(config.DB)
+	migration.AutoMigration(config.DB, config.DataBaseType)
 
 	return &Member{
 		AuthEnable:       config.AuthEnable,
@@ -23,18 +25,18 @@ func MemberSetup(config Config) *Member {
 }
 
 // list member
-func (member *Member) ListMembers(offset int, limit int, filter Filter, flag bool) (memb []tblmember, totoalmember int64, err error) {
+func (member *Member) ListMembers(offset int, limit int, filter Filter, flag bool) (memb []Tblmember, totoalmember int64, err error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
-		return []tblmember{}, 0, AuthErr
+		return []Tblmember{}, 0, AuthErr
 	}
 
 	memberlist, _, _ := Membermodel.MembersList(limit, offset, filter, flag, member.DB)
 
 	_, Total_users, _ := Membermodel.MembersList(0, 0, filter, flag, member.DB)
 
-	var memberlists []tblmember
+	var memberlists []Tblmember
 
 	for _, val := range memberlist {
 
@@ -74,16 +76,16 @@ func (member *Member) ListMembers(offset int, limit int, filter Filter, flag boo
 }
 
 // Create Member
-func (member *Member) CreateMember(Mc MemberCreationUpdation) (tblmember, error) {
+func (member *Member) CreateMember(Mc MemberCreationUpdation) (Tblmember, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
-		return tblmember{}, AuthErr
+		return Tblmember{}, AuthErr
 	}
 
 	uvuid := (uuid.New()).String()
 
-	var cmember tblmember
+	var cmember Tblmember
 
 	cmember.Uuid = uvuid
 
@@ -121,7 +123,7 @@ func (member *Member) CreateMember(Mc MemberCreationUpdation) (tblmember, error)
 
 	if err != nil {
 
-		return tblmember{}, err
+		return Tblmember{}, err
 	}
 
 	return cmember, nil
@@ -138,7 +140,7 @@ func (member *Member) UpdateMember(Mc MemberCreationUpdation, id int) error {
 
 	uvuid := (uuid.New()).String()
 
-	var umember tblmember
+	var umember Tblmember
 
 	umember.Uuid = uvuid
 
@@ -234,7 +236,7 @@ func (member *Member) CreateMemberProfile(Mc memberprofilecreationUpdation) erro
 	return nil
 }
 
-//update memberprofile
+// update memberprofile
 func (member *Member) UpdateMemberProfile(Mc memberprofilecreationUpdation) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
@@ -290,7 +292,7 @@ func (member *Member) DeleteMember(id int, modifiedBy int) error {
 		return AuthErr
 	}
 
-	var dmember tblmember
+	var dmember Tblmember
 
 	dmember.DeletedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 
@@ -304,4 +306,169 @@ func (member *Member) DeleteMember(id int, modifiedBy int) error {
 	}
 
 	return nil
+}
+
+// member token
+func (member *Member) GenerateMemberToken(memberid int, secretKey string) (token string, err error) {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+
+		return token, AuthErr
+	}
+
+	var MemberDetails TblMember
+
+	if err := Membermodel.GetMemberDetailsByMemberId(&MemberDetails, memberid, member.DB); err != nil {
+
+		return "", err
+	}
+
+	token, tokenerr := CreateMemberToken(MemberDetails.Id, MemberDetails.MemberGroupId, secretKey)
+
+	if tokenerr != nil {
+
+		return "", err
+	}
+
+	return token, nil
+}
+
+/*Create meber token*/
+func CreateMemberToken(userid, roleid int, secretkey string) (string, error) {
+
+	atClaims := jwt.MapClaims{}
+
+	atClaims["member_id"] = userid
+
+	atClaims["group_id"] = roleid
+
+	atClaims["expiry_time"] = time.Now().Add(2 * time.Hour).Unix()
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
+
+	return token.SignedString([]byte(secretkey))
+}
+
+// Get member data
+func (member *Member) GetMemberDetails(id int) (members Tblmember, err error) {
+
+	var memberdata Tblmember
+
+	err = Membermodel.MemberDetails(&memberdata, id, member.DB)
+
+	if err != nil {
+
+		return Tblmember{}, err
+	}
+
+	return memberdata, nil
+
+}
+
+// Get memberprofile data
+func (member *Member) GetMemberProfileByMemberId(memberid int) (memberprofs TblMemberProfile, err error) {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+
+		return TblMemberProfile{}, AuthErr
+	}
+
+	var memberprof TblMemberProfile
+
+	err1 := Membermodel.GetMemberProfileByMemberId(&memberprof, memberid, member.DB)
+
+	if err1 != nil {
+
+		return TblMemberProfile{}, err1
+	}
+
+	return memberprof, nil
+
+}
+
+// Check Number is already exits or not
+func (member *Member) CheckProfileSlugInMember(id int, number string) (bool, error) {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+
+		return false, AuthErr
+	}
+
+	var memberprof TblMemberProfile
+
+	err := Membermodel.CheckProfileSlugInMember(&memberprof, number, id, member.DB)
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+// member is_active
+func (member *Member) MemberStatus(memberid int, status int, modifiedby int) (bool, error) {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+		return false, AuthErr
+	}
+
+	var memberstatus TblMember
+	memberstatus.ModifiedBy = modifiedby
+	memberstatus.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	err := Membermodel.MemberStatus(memberstatus, memberid, status, member.DB)
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+
+}
+
+// multiselecte member delete
+func (member *Member) MultiSelectedMemberDelete(Memberid []int, modifiedby int) (bool, error) {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+		return false, AuthErr
+	}
+
+	var members TblMember
+	members.DeletedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+	members.DeletedBy = modifiedby
+	members.IsDeleted = 1
+
+	err := Membermodel.MultiSelectedMemberDelete(&members, Memberid, member.DB)
+
+	if err != nil {
+
+		return false, err
+	}
+
+	return true, nil
+}
+
+// multiselecte member status change
+func (member *Member) MultiSelectMembersStatus(memberid []int, status int, modifiedby int) (bool, error) {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+
+		return false, AuthErr
+	}
+
+	var memberstatus TblMember
+
+	memberstatus.ModifiedBy = modifiedby
+
+	memberstatus.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	err := Membermodel.MultiMemberIsActive(&memberstatus, memberid, status, member.DB)
+
+	if err != nil {
+
+		return false, err
+	}
+
+	return true, nil
+
 }

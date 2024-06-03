@@ -1,6 +1,11 @@
 package member
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/datatypes"
+	"gorm.io/gorm"
+)
 
 type Filter struct {
 	Keyword   string
@@ -70,6 +75,110 @@ type MemberGroupCreationUpdation struct {
 	IsActive    int
 }
 
+type MemberprofilecreationUpdation struct {
+	MemberId        int
+	ProfileId       int
+	CompanyName     string
+	CompanyLocation string
+	CompanyLogo     string
+	ProfileName     string
+	ProfilePage     string
+	About           string
+	LinkedIn        string
+	Website         string
+	Twitter         string
+	ClaimStatus     int
+	ProfileSlug     string
+	CreatedBy       int
+	ModifiedBy      int
+	SeoTitle        string
+	SeoDescription  string
+	SeoKeyword      string
+}
+
+type TblMemberGroup struct {
+	Id          int
+	Name        string
+	Slug        string
+	Description string
+	IsActive    int
+	IsDeleted   int
+	CreatedOn   time.Time
+	CreatedBy   int
+	ModifiedOn  time.Time
+	ModifiedBy  int
+	DeletedOn   time.Time
+	DeletedBy   int
+}
+
+type TblMember struct {
+	Id               int
+	Uuid             string
+	FirstName        string
+	LastName         string
+	Email            string
+	MobileNo         string
+	IsActive         int
+	ProfileImage     string
+	ProfileImagePath string
+	LastLogin        int
+	MemberGroupId    int
+	Password         string
+	Username         string
+	Otp              int
+	OtpExpiry        time.Time
+	LoginTime        time.Time
+	IsDeleted        int
+	DeletedOn        time.Time
+	DeletedBy        int
+	CreatedOn        time.Time
+	CreatedBy        int
+	ModifiedOn       time.Time
+	ModifiedBy       int
+}
+
+type TblMemberProfile struct {
+	Id              int
+	MemberId        int
+	ProfilePage     string
+	ProfileName     string
+	ProfileSlug     string
+	CompanyLogo     string
+	CompanyName     string
+	CompanyLocation string
+	About           string
+	Linkedin        string
+	Website         string
+	Twitter         string
+	SeoTitle        string
+	SeoDescription  string
+	SeoKeyword      string
+	MemberDetails   datatypes.JSONMap
+	ClaimStatus     int
+	CreatedBy       int
+	CreatedOn       time.Time
+	ModifiedBy      int
+	ModifiedOn      time.Time
+	IsDeleted       int
+	DeletedOn       time.Time
+}
+
+type TblMemberNotesHighlights struct {
+	Id                      int              
+	MemberId                int            
+	PageId                  int               
+	NotesHighlightsContent  string           
+	NotesHighlightsType     string          
+	HighlightsConfiguration datatypes.JSONMap 
+	CreatedBy               int               
+	CreatedOn               time.Time        
+	ModifiedBy              int             
+	ModifiedOn              time.Time        
+	DeletedBy               int             
+	DeletedOn               time.Time        
+	IsDeleted               int         
+}
+
 // soft delete check
 func IsDeleted(db *gorm.DB) *gorm.DB {
 	return db.Where("is_deleted = 0")
@@ -80,7 +189,7 @@ type MemberModel struct{}
 var Membermodel MemberModel
 
 // Member Group List
-func (membermodel MemberModel) MemberGroupList(listre MemberGroupListReq, DB *gorm.DB) (membergroup []tblmembergroup, TotalMemberGroup int64, err error) {
+func (membermodel MemberModel) MemberGroupList(listre MemberGroupListReq, DB *gorm.DB) (membergroup []Tblmembergroup, TotalMemberGroup int64, err error) {
 
 	query := DB.Model(TblMemberGroup{}).Scopes(IsDeleted).Order("id desc")
 
@@ -122,7 +231,7 @@ func (membermodel MemberModel) MemberGroupCreate(membergroup *TblMemberGroup, DB
 }
 
 // Member list
-func (membermodel MemberModel) MembersList(limit int, offset int, filter Filter, flag bool, DB *gorm.DB) (member []tblmember, Total_Member int64, err error) {
+func (membermodel MemberModel) MembersList(limit int, offset int, filter Filter, flag bool, DB *gorm.DB) (member []Tblmember, Total_Member int64, err error) {
 
 	query := DB.Model(TblMember{}).Select("tbl_members.id,tbl_members.uuid,tbl_members.member_group_id,tbl_members.first_name,tbl_members.last_name,tbl_members.email,tbl_members.mobile_no,tbl_members.profile_image,tbl_members.profile_image_path,tbl_members.created_on,tbl_members.created_by,tbl_members.modified_on,tbl_members.modified_by,tbl_members.is_active,tbl_members.is_deleted,tbl_members.deleted_on,tbl_members.deleted_by,tbl_member_groups.name as group_name").
 		Joins("inner join tbl_member_groups on tbl_members.member_group_id = tbl_member_groups.id").Joins("inner join tbl_member_profiles on tbl_members.id = tbl_member_profiles.member_id").Where("tbl_members.is_deleted=?", 0).Order("id desc")
@@ -161,7 +270,7 @@ func (membermodel MemberModel) MembersList(limit int, offset int, filter Filter,
 }
 
 // Member Insert
-func (membermodel MemberModel) MemberCreate(member *tblmember, DB *gorm.DB) error {
+func (membermodel MemberModel) MemberCreate(member *Tblmember, DB *gorm.DB) error {
 
 	if err := DB.Model(TblMember{}).Create(&member).Error; err != nil {
 
@@ -182,7 +291,7 @@ func (membermodel MemberModel) UpdateMemberProfile(memberprof *TblMemberProfile,
 }
 
 // Update Member
-func (membermodel MemberModel) UpdateMember(member *tblmember, DB *gorm.DB) error {
+func (membermodel MemberModel) UpdateMember(member *Tblmember, DB *gorm.DB) error {
 
 	query := DB.Model(TblMember{}).Where("id=?", member.Id)
 
@@ -227,7 +336,7 @@ func (membermodel MemberModel) MemberprofileUpdate(memberprof *TblMemberProfile,
 }
 
 // Delete Member
-func (membermodel MemberModel) DeleteMember(member *tblmember, id int, DB *gorm.DB) error {
+func (membermodel MemberModel) DeleteMember(member *Tblmember, id int, DB *gorm.DB) error {
 
 	if err := DB.Model(TblMember{}).Where("id=?", id).UpdateColumns(map[string]interface{}{"is_deleted": 1, "deleted_on": member.DeletedOn, "deleted_by": member.DeletedBy}).Error; err != nil {
 
@@ -275,19 +384,19 @@ func (membermodel MemberModel) CheckNumberInMember(member *TblMember, number str
 }
 
 // Name already exists
-func (membermodel MemberModel) CheckNameInMember(userid int, name string, DB *gorm.DB) (member tblmember, err error) {
+func (membermodel MemberModel) CheckNameInMember(userid int, name string, DB *gorm.DB) (member Tblmember, err error) {
 
 	if userid == 0 {
 
 		if err := DB.Model(TblMember{}).Where("LOWER(TRIM(username))=LOWER(TRIM(?)) and is_deleted=0", name).First(&member).Error; err != nil {
 
-			return tblmember{}, err
+			return Tblmember{}, err
 		}
 	} else {
 
 		if err := DB.Model(TblMember{}).Where("LOWER(TRIM(username))=LOWER(TRIM(?)) and id not in (?) and is_deleted=0", name, userid).First(&member).Error; err != nil {
 
-			return tblmember{}, err
+			return Tblmember{}, err
 		}
 	}
 
@@ -295,7 +404,7 @@ func (membermodel MemberModel) CheckNameInMember(userid int, name string, DB *go
 }
 
 // Member Group Update
-func (membermodel MemberModel) MemberGroupUpdate(membergroup *tblmembergroup, id int, DB *gorm.DB) error {
+func (membermodel MemberModel) MemberGroupUpdate(membergroup *Tblmembergroup, id int, DB *gorm.DB) error {
 
 	if err := DB.Model(TblMemberGroup{}).Where("id=?", id).Updates(TblMemberGroup{Name: membergroup.Name, Slug: membergroup.Slug, Description: membergroup.Description, Id: membergroup.Id, ModifiedOn: membergroup.ModifiedOn, ModifiedBy: membergroup.ModifiedBy}).Error; err != nil {
 
@@ -306,12 +415,162 @@ func (membermodel MemberModel) MemberGroupUpdate(membergroup *tblmembergroup, id
 }
 
 // Member Group Delete
-func (membermodel MemberModel) DeleteMemberGroup(membergroup *tblmembergroup, id int, DB *gorm.DB) error {
+func (membermodel MemberModel) DeleteMemberGroup(membergroup *Tblmembergroup, id int, DB *gorm.DB) error {
 
 	if err := DB.Debug().Model(TblMemberGroup{}).Where("id=?", id).UpdateColumns(map[string]interface{}{"is_deleted": 1, "modified_by": membergroup.ModifiedBy}).Error; err != nil {
 
 		return err
 
 	}
+	return nil
+}
+
+// get member group
+func (membermodel MemberModel) GetGroupData(membergroup []Tblmembergroup, DB *gorm.DB) (membergrouplists []Tblmembergroup, err error) {
+
+	var membergrouplist []Tblmembergroup
+
+	if err := DB.Table("tbl_member_groups").Where("is_deleted = 0 and is_active = 1").Order("name").Find(&membergrouplist).Error; err != nil {
+
+		return []Tblmembergroup{}, err
+
+	}
+
+	return membergrouplist, nil
+
+}
+
+// get member details
+func (membermodel MemberModel) GetMemberDetailsByMemberId(MemberDetails *TblMember, memberId int, DB *gorm.DB) error {
+
+	if err := DB.Model(TblMember{}).Where("is_deleted=0 and id = ?", memberId).First(&MemberDetails).Error; err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+// Get Member Details
+func (membermodel MemberModel) MemberDetails(member *Tblmember, memberid int, DB *gorm.DB) error {
+
+	if err := DB.Table("tbl_members").Select("tbl_members.*,tbl_member_groups.name as group_name").Joins("inner join tbl_member_groups on tbl_member_groups.id = tbl_members.member_group_id").Where("tbl_members.id=?", memberid).First(&member).Error; err != nil {
+		return err
+
+	}
+
+	return nil
+}
+
+func (membermodel MemberModel) CheckProfileSlugInMember(member *TblMemberProfile, name string, memberid int, DB *gorm.DB) error {
+
+	query := DB.Model(TblMemberProfile{}).Where("profile_slug = ? and is_deleted=0", name)
+
+	if memberid > 0 {
+
+		query = query.Where("member_id not in (?)", memberid)
+	}
+
+	if err := query.First(&member).Error; err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+// Member  IsActive Function
+func (membermodel MemberModel) MemberStatus(memberstatus TblMember, memberid int, status int, DB *gorm.DB) error {
+
+	if err := DB.Model(TblMember{}).Where("id=?", memberid).UpdateColumns(map[string]interface{}{"is_active": status, "modified_by": memberstatus.ModifiedBy, "modified_on": memberstatus.ModifiedOn}).Error; err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+// MultiSelectedMemberDelete
+func (membermodel MemberModel) MultiSelectedMemberDelete(member *TblMember, id []int, DB *gorm.DB) error {
+
+	return DB.Transaction(func(tx *gorm.DB) error {
+
+		if err := DB.Model(&member).Where("id in (?)", id).UpdateColumns(map[string]interface{}{"is_deleted": 1, "deleted_on": member.DeletedOn, "deleted_by": member.DeletedBy}).Error; err != nil {
+
+			return err
+
+		}
+
+		if err := DB.Table("tbl_member_profiles").Where("id in (?)", id).UpdateColumns(map[string]interface{}{"is_deleted": 1, "deleted_on": member.DeletedOn, "deleted_by": member.DeletedBy}).Error; err != nil {
+
+			return err
+
+		}
+
+		return nil
+
+	})
+}
+
+func (membermodel MemberModel) MultiMemberIsActive(memberstatus *TblMember, memberid []int, status int, DB *gorm.DB) error {
+
+	if err := DB.Debug().Model(TblMember{}).Where("id in (?)", memberid).UpdateColumns(map[string]interface{}{"is_active": status, "modified_by": memberstatus.ModifiedBy, "modified_on": memberstatus.ModifiedOn}).Error; err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+// Member la IsActive Function
+func (membermodel MemberModel) MemberGroupIsActive(memberstatus *Tblmembergroup, memberid int, status int, DB *gorm.DB) error {
+
+	if err := DB.Table("tbl_member_groups").Where("id=?", memberid).UpdateColumns(map[string]interface{}{"is_active": status, "modified_by": memberstatus.ModifiedBy, "modified_on": memberstatus.ModifiedOn}).Error; err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+// Group Name already exists
+func (membermodel MemberModel) CheckNameInMemberGroup(member *Tblmembergroup, userid int, name string, DB *gorm.DB) error {
+
+	if userid == 0 {
+
+		if err := DB.Table("tbl_member_groups").Where("LOWER(TRIM(name))=LOWER(TRIM(?)) and is_deleted=0", name).First(&member).Error; err != nil {
+
+			return err
+		}
+	} else {
+
+		if err := DB.Table("tbl_member_groups").Where("LOWER(TRIM(name))=LOWER(TRIM(?)) and id not in (?) and is_deleted=0", name, userid).First(&member).Error; err != nil {
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+// selected member group delete
+func (membermodel MemberModel) MultiSelectedMemberDeletegroup(member *Tblmembergroup, id []int, DB *gorm.DB) error {
+
+	if err := DB.Table("tbl_member_groups").Where("id in (?)", id).UpdateColumns(map[string]interface{}{"is_deleted": member.IsDeleted, "deleted_on": member.DeletedOn, "deleted_by": member.DeletedBy}).Error; err != nil {
+
+		return err
+
+	}
+	return nil
+}
+
+// selected member group status change
+func (membermodel MemberModel) MultiMemberGroupIsActive(memberstatus *TblMemberGroup, memberid []int, status int, DB *gorm.DB) error {
+
+	if err := DB.Table("tbl_member_groups").Where("id in (?)", memberid).UpdateColumns(map[string]interface{}{"is_active": status, "modified_by": memberstatus.ModifiedBy, "modified_on": memberstatus.ModifiedOn}).Error; err != nil {
+
+		return err
+	}
+
 	return nil
 }

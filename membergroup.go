@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type tblmember struct {
+type Tblmember struct {
 	Id               int `gorm:"primaryKey;auto_increment;"`
 	Uuid             string
 	FirstName        string
@@ -34,9 +34,10 @@ type tblmember struct {
 	ModifiedDate     string    `gorm:"-"`
 	NameString       string    `gorm:"-"`
 	LoginTime        time.Time `gorm:"DEFAULT:NULL"`
+	Token            string
 }
 
-type tblmembergroup struct {
+type Tblmembergroup struct {
 	Id          int `gorm:"primaryKey;auto_increment;"`
 	Name        string
 	Slug        string
@@ -47,25 +48,27 @@ type tblmembergroup struct {
 	CreatedBy   int
 	ModifiedOn  time.Time `gorm:"DEFAULT:NULL"`
 	ModifiedBy  int       `gorm:"DEFAULT:NULL"`
-	DateString  string    `gorm:"-"`
+	DeletedOn   time.Time
+	DeletedBy   int
+	DateString  string `gorm:"-"`
 }
 
 // Function ListMemberGroup pass the arguments of limit,offset and filter (eg. keywords)
 // It will return the all membergroup lists
-func (member *Member) ListMemberGroup(listreq MemberGroupListReq) (membergroup []tblmembergroup, MemberGroupCount int64, err error) {
+func (member *Member) ListMemberGroup(listreq MemberGroupListReq) (membergroup []Tblmembergroup, MemberGroupCount int64, err error) {
 
 	AuthErr := AuthandPermission(member)
 
 	if AuthErr != nil {
 
-		return []tblmembergroup{}, 0, AuthErr
+		return []Tblmembergroup{}, 0, AuthErr
 	}
 
-	_, membercounts,  _:= Membermodel.MemberGroupList(MemberGroupListReq{Limit: 0,Offset: 0,Keyword: listreq.Keyword,ActiveGroupsOnly: listreq.ActiveGroupsOnly}, member.DB)
+	_, membercounts, _ := Membermodel.MemberGroupList(MemberGroupListReq{Limit: 0, Offset: 0, Keyword: listreq.Keyword, ActiveGroupsOnly: listreq.ActiveGroupsOnly}, member.DB)
 
-	membergrouplist, _,_  := Membermodel.MemberGroupList(listreq, member.DB)
+	membergrouplist, _, _ := Membermodel.MemberGroupList(listreq, member.DB)
 
-	var membergrouplists []tblmembergroup
+	var membergrouplists []Tblmembergroup
 
 	for _, val := range membergrouplist {
 
@@ -124,7 +127,7 @@ func (member *Member) CreateMemberGroup(membergrpc MemberGroupCreation) error {
 }
 
 /*Update Member Group*/
-func (member *Member) UpdateMemberGroup(membergrpc MemberGroupCreationUpdation,id int) error {
+func (member *Member) UpdateMemberGroup(membergrpc MemberGroupCreationUpdation, id int) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -136,7 +139,7 @@ func (member *Member) UpdateMemberGroup(membergrpc MemberGroupCreationUpdation,i
 		return ErrorEmpty
 	}
 
-	var membergroup tblmembergroup
+	var membergroup Tblmembergroup
 
 	membergroup.Id = id
 
@@ -152,7 +155,7 @@ func (member *Member) UpdateMemberGroup(membergrpc MemberGroupCreationUpdation,i
 
 	membergroup.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 
-	err := Membermodel.MemberGroupUpdate(&membergroup,id, member.DB)
+	err := Membermodel.MemberGroupUpdate(&membergroup, id, member.DB)
 
 	if err != nil {
 
@@ -170,11 +173,11 @@ func (member *Member) DeleteMemberGroup(id int, modifiedBy int) error {
 		return AuthErr
 	}
 
-	var tblmembergroup tblmembergroup
+	var Tblmembergroup Tblmembergroup
 
-	tblmembergroup.ModifiedBy = modifiedBy
+	Tblmembergroup.ModifiedBy = modifiedBy
 
-	err := Membermodel.DeleteMemberGroup(&tblmembergroup, id, member.DB)
+	err := Membermodel.DeleteMemberGroup(&Tblmembergroup, id, member.DB)
 
 	if err != nil {
 
@@ -182,4 +185,116 @@ func (member *Member) DeleteMemberGroup(id int, modifiedBy int) error {
 	}
 
 	return nil
+}
+
+func (member *Member) GetGroupData() (membergroup []Tblmembergroup, err error) {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+
+		return []Tblmembergroup{}, AuthErr
+	}
+
+	var memgroup []Tblmembergroup
+
+	membergrouplist, _ := Membermodel.GetGroupData(memgroup, member.DB)
+
+	return membergrouplist, nil
+
+}
+
+// member group is_active
+func (member *Member) MemberGroupIsActive(memberid int, status int, modifiedby int) (bool, error) {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+
+		return false, AuthErr
+	}
+
+	var tblmembergroup Tblmembergroup
+
+	tblmembergroup.ModifiedBy = modifiedby
+
+	tblmembergroup.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	err := Membermodel.MemberGroupIsActive(&tblmembergroup, memberid, status, member.DB)
+
+	if err != nil {
+
+		return false, err
+
+	}
+	return true, nil
+
+}
+
+// Check Group Name is already exits or not
+func (member *Member) CheckNameInMemberGroup(id int, name string) (bool, error) {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+
+		return false, AuthErr
+	}
+
+	var tblmembergroup Tblmembergroup
+
+	err := Membermodel.CheckNameInMemberGroup(&tblmembergroup, id, name, member.DB)
+
+	if err != nil {
+
+		return false, err
+
+	}
+
+	return true, nil
+}
+
+// MULTI SELECT MEMBERGROUP DELETE FUNCTION//
+func (member *Member) MultiSelectedMemberDeletegroup(Memberid []int, modifiedby int) (bool, error) {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+
+		return false, AuthErr
+	}
+	var tblmembergroup Tblmembergroup
+
+	tblmembergroup.DeletedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	tblmembergroup.DeletedBy = modifiedby
+
+	tblmembergroup.IsDeleted = 1
+
+	err := Membermodel.MultiSelectedMemberDeletegroup(&tblmembergroup, Memberid, member.DB)
+
+	if err != nil {
+
+		return false, err
+	}
+
+	return true, nil
+
+}
+
+// multi select membergroup status
+func (member *Member) MultiSelectMembersgroupStatus(memberid []int, status int, modifiedby int) (bool, error) {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+
+		return false, AuthErr
+	}
+	
+	var memberstatus TblMemberGroup
+
+	memberstatus.ModifiedBy = modifiedby
+
+	memberstatus.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	err := Membermodel.MultiMemberGroupIsActive(&memberstatus, memberid, status, member.DB)
+
+	if err != nil {
+
+		return false, err
+	}
+
+	return true, nil
+
 }
