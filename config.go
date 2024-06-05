@@ -30,4 +30,6 @@ type Member struct {
 	DB               *gorm.DB
 	Auth             *auth.Auth
 	Permissions      *role.PermissionConfig
+	UserId           int
+	DataAccess       int
 }

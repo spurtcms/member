@@ -167,7 +167,10 @@ func IsDeleted(db *gorm.DB) *gorm.DB {
 	return db.Where("is_deleted = 0")
 }
 
-type MemberModel struct{}
+type MemberModel struct {
+	Userid     int
+	DataAccess int
+}
 
 var Membermodel MemberModel
 
@@ -175,6 +178,12 @@ var Membermodel MemberModel
 func (membermodel MemberModel) MemberGroupList(listre MemberGroupListReq, DB *gorm.DB) (membergroup []Tblmembergroup, TotalMemberGroup int64, err error) {
 
 	query := DB.Table("tbl_member_groups").Scopes(IsDeleted).Order("id desc")
+
+	if membermodel.DataAccess == 1 {
+
+		query = query.Where("tbl_member_groups.created_by =?", membermodel.Userid)
+
+	}
 
 	if listre.Keyword != "" {
 
@@ -218,6 +227,12 @@ func (membermodel MemberModel) MembersList(limit int, offset int, filter Filter,
 
 	query := DB.Table("tbl_members").Select("tbl_members.id,tbl_members.uuid,tbl_members.member_group_id,tbl_members.first_name,tbl_members.last_name,tbl_members.email,tbl_members.mobile_no,tbl_members.profile_image,tbl_members.profile_image_path,tbl_members.created_on,tbl_members.created_by,tbl_members.modified_on,tbl_members.modified_by,tbl_members.is_active,tbl_members.is_deleted,tbl_members.deleted_on,tbl_members.deleted_by,tbl_member_groups.name as group_name").
 		Joins("inner join tbl_member_groups on tbl_members.member_group_id = tbl_member_groups.id").Joins("inner join tbl_member_profiles on tbl_members.id = tbl_member_profiles.member_id").Where("tbl_members.is_deleted=?", 0).Order("id desc")
+
+	if membermodel.DataAccess == 1 {
+
+		query = query.Where("tbl_members.created_by =?", membermodel.Userid)
+
+	}
 
 	if filter.Keyword != "" {
 
