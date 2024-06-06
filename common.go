@@ -7,9 +7,10 @@ import (
 )
 
 var (
-	ErrorAuth       = errors.New("auth enabled not initialised")
-	ErrorPermission = errors.New("permissions enabled not initialised")
-	ErrorEmpty      = errors.New("given some values is empty")
+	ErrorAuth          = errors.New("auth enabled not initialised")
+	ErrorPermission    = errors.New("permissions enabled not initialised")
+	ErrorEmpty         = errors.New("given some values is empty")
+	ErrorPassMissMatch = errors.New("new passowrd and confirmation password mismatched")
 )
 
 func AuthandPermission(member *Member) error {

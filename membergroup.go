@@ -5,38 +5,6 @@ import (
 	"time"
 )
 
-type Tblmember struct {
-	Id               int `gorm:"primaryKey;auto_increment;"`
-	Uuid             string
-	FirstName        string
-	LastName         string
-	Email            string
-	MobileNo         string
-	IsActive         int
-	ProfileImage     string
-	ProfileImagePath string
-	LastLogin        int
-	IsDeleted        int
-	DeletedOn        time.Time `gorm:"DEFAULT:NULL"`
-	DeletedBy        int       `gorm:"DEFAULT:NULL"`
-	CreatedOn        time.Time `gorm:"DEFAULT:NULL"`
-	CreatedDate      string    `gorm:"-"`
-	CreatedBy        int
-	ModifiedOn       time.Time `gorm:"DEFAULT:NULL"`
-	ModifiedBy       int       `gorm:"DEFAULT:NULL"`
-	MemberGroupId    int
-	GroupName        string `gorm:"-:migration;<-:false"`
-	Password         string
-	DateString       string    `gorm:"-"`
-	Username         string    `gorm:"DEFAULT:NULL"`
-	Otp              int       `gorm:"DEFAULT:NULL"`
-	OtpExpiry        time.Time `gorm:"DEFAULT:NULL"`
-	ModifiedDate     string    `gorm:"-"`
-	NameString       string    `gorm:"-"`
-	LoginTime        time.Time `gorm:"DEFAULT:NULL"`
-	Token            string    `gorm:"-"`
-}
-
 type Tblmembergroup struct {
 	Id          int `gorm:"primaryKey;auto_increment;"`
 	Name        string

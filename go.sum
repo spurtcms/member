@@ -16,6 +16,7 @@ github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a h1:bbPeKD0xmW/
 github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a/go.mod h1:5TJZWKEWniPve33vlWYSoGYefn3gLQRzjfDlhSJ9ZKM=
 github.com/jackc/pgx/v5 v5.3.0 h1:/NQi8KHMpKWHInxXesC8yD4DhkXPrVhmnwYkjp9AmBA=
 github.com/jackc/pgx/v5 v5.3.0/go.mod h1:t3JDKnCBlYIc0ewLF0Q7B8MXmoIaBOZj/ic7iHozM/8=
+github.com/jackc/pgx/v5 v5.5.5/go.mod h1:ez9gk+OAat140fv9ErkZDYFWmXLfV+++K0uAOiwgm1A=
 github.com/jackc/puddle/v2 v2.2.0/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
 github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
 github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
@@ -35,8 +36,12 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/rogpeppe/go-internal v1.6.1/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=
 github.com/spurtcms/auth v0.0.0-20240415142453-2abf782563fe h1:ANpdFPlbmmh1qTMFxWSjGn/m3V7a6Jt0H7/JvWqalh8=
 github.com/spurtcms/auth v0.0.0-20240415142453-2abf782563fe/go.mod h1:twSrHwCvx8mSOtS75Vcjoo4jLNX3jIf7NLadvZH932c=
+github.com/spurtcms/auth v0.0.6 h1:mQ4Dk3ghv/zIkjHtEAEl8yF/rrbVeZRIdmnLEmBw/lU=
+github.com/spurtcms/auth v0.0.6/go.mod h1:1u46UkHWHcsN99jNGCaei0/75rslezIpOGITEhVkvAM=
 github.com/spurtcms/team-roles v0.0.0-20240415142624-666b8897005b h1:hnAdxkSBR6IWK/itrdFBdbNy+jjSnDIYuF6ZGET8OoM=
 github.com/spurtcms/team-roles v0.0.0-20240415142624-666b8897005b/go.mod h1:5HOK30Lr10UQ1HLmXcPaluBRPCLUcYgQg31vBQYKoRQ=
+github.com/spurtcms/team-roles v0.0.5 h1:cdakl6Hh5Gkl2+YC5h8IpTl5Dcn+mt7cSFMQfHcP1Gg=
+github.com/spurtcms/team-roles v0.0.5/go.mod h1:WFP36zjRo6gkKTFrWy6DT/B+Nh/V/1xHTYS7kJcNPGA=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSSt89Yw=
 github.com/stretchr/objx v0.5.0/go.mod h1:Yh+to48EsGEfYuaHDzXPcE3xhTkx73EhmCGUpEOglKo=

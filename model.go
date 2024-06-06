@@ -162,6 +162,39 @@ type TblMemberNotesHighlights struct {
 	IsDeleted               int
 }
 
+type Tblmember struct {
+	Id               int `gorm:"primaryKey;auto_increment;"`
+	Uuid             string
+	FirstName        string
+	LastName         string
+	Email            string
+	MobileNo         string
+	IsActive         int
+	ProfileImage     string
+	ProfileImagePath string
+	LastLogin        int
+	IsDeleted        int
+	DeletedOn        time.Time `gorm:"DEFAULT:NULL"`
+	DeletedBy        int       `gorm:"DEFAULT:NULL"`
+	CreatedOn        time.Time `gorm:"DEFAULT:NULL"`
+	CreatedDate      string    `gorm:"-"`
+	CreatedBy        int
+	ModifiedOn       time.Time `gorm:"DEFAULT:NULL"`
+	ModifiedBy       int       `gorm:"DEFAULT:NULL"`
+	MemberGroupId    int
+	GroupName        string `gorm:"-:migration;<-:false"`
+	Password         string
+	DateString       string           `gorm:"-"`
+	Username         string           `gorm:"DEFAULT:NULL"`
+	Otp              int              `gorm:"DEFAULT:NULL"`
+	OtpExpiry        time.Time        `gorm:"DEFAULT:NULL"`
+	ModifiedDate     string           `gorm:"-"`
+	NameString       string           `gorm:"-"`
+	LoginTime        time.Time        `gorm:"DEFAULT:NULL"`
+	Token            string           `gorm:"-"`
+	TblMemberProfile TblMemberProfile `gorm:"foreignkey:MemberId;<-:false"`
+}
+
 // soft delete check
 func IsDeleted(db *gorm.DB) *gorm.DB {
 	return db.Where("is_deleted = 0")
@@ -576,6 +609,104 @@ func (membermodel MemberModel) MultiMemberGroupIsActive(memberstatus *TblMemberG
 func (membermodel MemberModel) CreateMemberProfile(memberprof *TblMemberProfile, DB *gorm.DB) error {
 
 	if err := DB.Table("tbl_member_profiles").Create(&memberprof).Error; err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+func (membermodel MemberModel) CheckProfileSlug(profileSlug string, DB *gorm.DB) (tblprofile TblMemberProfile, err error) {
+
+	if err := DB.Table("tbl_member_profiles").Select("id").Where("is_deleted = 0 and LOWER(profile_slug) = ?", profileSlug).First(&tblprofile).Error; err != nil {
+
+		return tblprofile, err
+	}
+
+	return tblprofile, nil
+}
+
+func (membermodel MemberModel) GetMemberProfile(Email string, profileId int, profileSlug string, DB *gorm.DB) (tblmember Tblmember, err error) {
+
+	query := DB.Table("tbl_members").Preload("TblMemberProfile", func(db *gorm.DB) *gorm.DB {
+		return db.Where("profile_slug = ? or id =?", profileSlug, profileId)
+	})
+
+	if Email != "" {
+		query = query.Where("email = ?", Email)
+	}
+
+	if profileId != 0 {
+		query = query.Where("id = (select member_id from tbl_member_profiles where id=?)", profileId)
+	}
+
+	if profileSlug != "" {
+		query = query.Where("id = (select member_id from tbl_member_profiles where profile_slug=?)", profileSlug)
+	}
+
+	query.First(&tblmember)
+
+	if err := query.Error; err != nil {
+		return tblmember, err
+	}
+	return tblmember, nil
+}
+
+func (membermodel MemberModel) AllMemberCount(DB *gorm.DB) (count int64, err error) {
+
+	if err := DB.Table("tbl_members").Where("is_deleted = 0 ").Count(&count).Error; err != nil {
+
+		return 0, err
+	}
+
+	return count, nil
+
+}
+
+func (membermodel MemberModel) NewmemberCount(DB *gorm.DB) (count int64, err error) {
+
+	if err := DB.Table("tbl_members").Where("is_deleted = 0 AND created_on >=?", time.Now().AddDate(0, 0, -10)).Count(&count).Error; err != nil {
+
+		return 0, err
+	}
+
+	return count, nil
+
+}
+func (membermodel MemberModel) ActiveMemberList(member []Tblmember, limit int, DB *gorm.DB) (members []Tblmember, err error) {
+
+	if err := DB.Table("tbl_members").Where("is_deleted=0 and last_login=1 AND login_time >=?", time.Now().UTC().Add(-8*time.Hour).Format("2006-01-02 15:04:05")).Find(&members).Limit(limit).Error; err != nil {
+
+		return []Tblmember{}, err
+
+	}
+
+	return members, nil
+}
+
+func (membermodel MemberModel) FlexibleMemberUpdate(memberData map[string]interface{}, memberid int, DB *gorm.DB) error {
+
+	if err := DB.Table("tbl_members").Where("is_deleted = 0 and id = ?", memberid).UpdateColumns(memberData).Error; err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+func (membermodel MemberModel) FlexibleMemberProfileUpdate(memberProfileData map[string]interface{}, memberid int, DB *gorm.DB) error {
+
+	if err := DB.Table("tbl_member_profiles").Where("is_deleted = 0 and member_id = ?", memberid).UpdateColumns(memberProfileData).Error; err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+func (membermodel MemberModel) MemberPasswordUpdate(memberData TblMember, memberId int, DB *gorm.DB) error {
+
+	if err := DB.Table("tbl_members").Where("is_deleted = 0 and id = ?", memberId).UpdateColumns(map[string]interface{}{"password": memberData.Password, "modified_by": memberData.ModifiedBy, "modified_on": memberData.ModifiedOn}).Error; err != nil {
 
 		return err
 	}
