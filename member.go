@@ -224,7 +224,7 @@ func (member *Member) CreateMemberProfile(Mc MemberprofilecreationUpdation) erro
 
 	memberprof.CreatedBy = Mc.ModifiedBy
 
-	err2 := Membermodel.CreateMemberProfile(&memberprof,member.DB)
+	err2 := Membermodel.CreateMemberProfile(&memberprof, member.DB)
 
 	if err2 != nil {
 
@@ -233,7 +233,6 @@ func (member *Member) CreateMemberProfile(Mc MemberprofilecreationUpdation) erro
 
 	return nil
 }
-
 
 // update memberprofile
 func (member *Member) UpdateMemberProfile(Mc MemberprofilecreationUpdation) error {
@@ -245,7 +244,7 @@ func (member *Member) UpdateMemberProfile(Mc MemberprofilecreationUpdation) erro
 
 	var memberprof TblMemberProfile
 
-	memberprof.MemberId = Mc.ProfileId
+	memberprof.MemberId = Mc.MemberId
 
 	memberprof.Id = Mc.ProfileId
 
@@ -308,7 +307,7 @@ func (member *Member) DeleteMember(id int, modifiedBy int) error {
 }
 
 // member token
-func (member *Member) GenerateMemberToken(memberid int, secretKey string) (token string, err error) {
+func (member *Member) GenerateMemberToken(memberid int, loginType string, secretKey string) (token string, err error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -322,7 +321,7 @@ func (member *Member) GenerateMemberToken(memberid int, secretKey string) (token
 		return "", err
 	}
 
-	token, tokenerr := CreateMemberToken(MemberDetails.Id, MemberDetails.MemberGroupId, secretKey)
+	token, tokenerr := CreateMemberToken(MemberDetails.Id, MemberDetails.MemberGroupId, secretKey, loginType)
 
 	if tokenerr != nil {
 
@@ -333,19 +332,15 @@ func (member *Member) GenerateMemberToken(memberid int, secretKey string) (token
 }
 
 /*Create meber token*/
-func CreateMemberToken(userid, roleid int, secretkey string) (string, error) {
+func CreateMemberToken(userid, roleId int, secretKey string, loginType string) (string, error) {
 
 	atClaims := jwt.MapClaims{}
-
 	atClaims["member_id"] = userid
-
-	atClaims["group_id"] = roleid
-
+	atClaims["group_id"] = roleId
 	atClaims["expiry_time"] = time.Now().Add(2 * time.Hour).Unix()
-
+	atClaims["login_type"] = loginType
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
-
-	return token.SignedString([]byte(secretkey))
+	return token.SignedString([]byte(secretKey))
 }
 
 // Get member data
@@ -416,7 +411,6 @@ func (member *Member) MemberStatus(memberid int, status int, modifiedby int) (bo
 	memberstatus.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 
 	err := Membermodel.MemberStatus(memberstatus, memberid, status, member.DB)
-
 	if err != nil {
 		return false, err
 	}
@@ -438,7 +432,6 @@ func (member *Member) MultiSelectedMemberDelete(Memberid []int, modifiedby int) 
 	members.IsDeleted = 1
 
 	err := Membermodel.MultiSelectedMemberDelete(&members, Memberid, member.DB)
-
 	if err != nil {
 
 		return false, err
@@ -456,13 +449,10 @@ func (member *Member) MultiSelectMembersStatus(memberid []int, status int, modif
 	}
 
 	var memberstatus TblMember
-
 	memberstatus.ModifiedBy = modifiedby
-
 	memberstatus.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 
 	err := Membermodel.MultiMemberIsActive(&memberstatus, memberid, status, member.DB)
-
 	if err != nil {
 
 		return false, err

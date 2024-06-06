@@ -322,11 +322,11 @@ func (membermodel MemberModel) MemberprofileUpdate(memberprof *TblMemberProfile,
 
 	if memberprof.CompanyLogo == "" {
 
-		query.Omit("company_logo").UpdateColumns(map[string]interface{}{"member_id": memberprof.MemberId, "profile_name": memberprof.ProfileName, "profile_slug": memberprof.ProfileSlug, "company_name": memberprof.CompanyName, "company_location": memberprof.CompanyLocation, "about": memberprof.About, "seo_title": memberprof.SeoTitle, "seo_description": memberprof.SeoDescription, "seo_keyword": memberprof.SeoKeyword, "profile_page": memberprof.ProfilePage, "twitter": memberprof.Twitter, "linkedin": memberprof.Linkedin, "website": memberprof.Website, "claim_status": memberprof.ClaimStatus, "modified_by": memberprof.ModifiedBy, "modified_on": memberprof.ModifiedOn})
+		query.Omit("company_logo").UpdateColumns(map[string]interface{}{"profile_name": memberprof.ProfileName, "profile_slug": memberprof.ProfileSlug, "company_name": memberprof.CompanyName, "company_location": memberprof.CompanyLocation, "about": memberprof.About, "seo_title": memberprof.SeoTitle, "seo_description": memberprof.SeoDescription, "seo_keyword": memberprof.SeoKeyword, "profile_page": memberprof.ProfilePage, "twitter": memberprof.Twitter, "linkedin": memberprof.Linkedin, "website": memberprof.Website, "claim_status": memberprof.ClaimStatus, "modified_by": memberprof.ModifiedBy, "modified_on": memberprof.ModifiedOn})
 
 	} else {
 
-		query.UpdateColumns(map[string]interface{}{"member_id": memberprof.MemberId, "profile_name": memberprof.ProfileName, "profile_slug": memberprof.ProfileSlug, "company_name": memberprof.CompanyName, "company_logo": memberprof.CompanyLogo, "company_location": memberprof.CompanyLocation, "about": memberprof.About, "seo_title": memberprof.SeoTitle, "seo_description": memberprof.SeoDescription, "seo_keyword": memberprof.SeoKeyword, "profile_page": memberprof.ProfilePage, "twitter": memberprof.Twitter, "linkedin": memberprof.Linkedin, "website": memberprof.Website, "claim_status": memberprof.ClaimStatus, "modified_by": memberprof.ModifiedBy, "modified_on": memberprof.ModifiedOn})
+		query.UpdateColumns(map[string]interface{}{"profile_name": memberprof.ProfileName, "profile_slug": memberprof.ProfileSlug, "company_name": memberprof.CompanyName, "company_logo": memberprof.CompanyLogo, "company_location": memberprof.CompanyLocation, "about": memberprof.About, "seo_title": memberprof.SeoTitle, "seo_description": memberprof.SeoDescription, "seo_keyword": memberprof.SeoKeyword, "profile_page": memberprof.ProfilePage, "twitter": memberprof.Twitter, "linkedin": memberprof.Linkedin, "website": memberprof.Website, "claim_status": memberprof.ClaimStatus, "modified_by": memberprof.ModifiedBy, "modified_on": memberprof.ModifiedOn})
 
 	}
 
