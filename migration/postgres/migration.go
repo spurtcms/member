@@ -92,9 +92,19 @@ type TblMemberNotesHighlights struct {
 	IsDeleted               int               `gorm:"type:integer"`
 }
 
+
+type TblMemberSetting struct {
+	Id                int       `gorm:"primaryKey;auto_increment;"`
+	AllowRegistration int       `gorm:"type:int"`
+	MemberLogin       string    `gorm:"type:varchar(255)"`
+	ModifiedBy        int       `gorm:"type:integer"`
+	ModifiedOn        time.Time `gorm:"type:datetime;DEFAULT:NULL"`
+	NotificationUsers string    `gorm:"type:varchar(255)"`
+}
+
 // MigrateTable creates this package related tables in your database
 func MigrateTables(db *gorm.DB) {
 
-	db.AutoMigrate(&TblMemberGroup{}, &TblMember{}, &TblMemberNotesHighlights{}, &TblMemberProfile{})
+	db.AutoMigrate(&TblMemberGroup{}, &TblMember{}, &TblMemberNotesHighlights{}, &TblMemberProfile{},&TblMemberSetting{})
 
 }

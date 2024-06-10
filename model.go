@@ -195,6 +195,22 @@ type Tblmember struct {
 	TblMemberProfile TblMemberProfile `gorm:"foreignkey:MemberId;<-:false"`
 }
 
+type TblMemberSetting struct {
+	Id                int
+	AllowRegistration int
+	MemberLogin       string // otp/password
+	ModifiedBy        int
+	ModifiedOn        time.Time
+	NotificationUsers string //notification team users id
+}
+
+type MemberSettings struct {
+	AllowRegistration int
+	MemberLogin       string // otp/password
+	ModifiedBy        int
+	NotificationUsers string //notification team users id
+}
+
 // soft delete check
 func IsDeleted(db *gorm.DB) *gorm.DB {
 	return db.Where("is_deleted = 0")
@@ -626,22 +642,26 @@ func (membermodel MemberModel) CheckProfileSlug(profileSlug string, DB *gorm.DB)
 	return tblprofile, nil
 }
 
-func (membermodel MemberModel) GetMemberProfile(Email string, profileId int, profileSlug string, DB *gorm.DB) (tblmember Tblmember, err error) {
+func (membermodel MemberModel) GetMemberProfile(memberId int,emailid string, profileId int, profileSlug string, DB *gorm.DB) (tblmember Tblmember, err error) {
 
-	query := DB.Table("tbl_members").Preload("TblMemberProfile", func(db *gorm.DB) *gorm.DB {
-		return db.Where("profile_slug = ? or id =?", profileSlug, profileId)
-	})
+	query := DB.Table("tbl_members").Preload("TblMemberProfile")
 
-	if Email != "" {
-		query = query.Where("email = ?", Email)
-	}
+	if memberId != 0 {
 
-	if profileId != 0 {
-		query = query.Where("id = (select member_id from tbl_member_profiles where id=?)", profileId)
-	}
+		query = query.Where("is_deleted = 0 and id = ?", memberId)
 
-	if profileSlug != "" {
-		query = query.Where("id = (select member_id from tbl_member_profiles where profile_slug=?)", profileSlug)
+	}else if emailid != ""{
+
+		query = query.Where("is_deleted = 0 and email = ?", emailid)
+
+	}else if profileSlug != "" {
+
+		query = query.Where("is_deleted = 0 and id = (select member_id from tbl_member_profiles where is_deleted = 0 and profile_slug=?)", profileSlug)
+
+	}else if profileId != 0 {
+
+		query = query.Where("is_deleted = 0 and id = (select member_id from tbl_member_profiles where is_deleted = 0 and id=?)", profileId)
+
 	}
 
 	query.First(&tblmember)
@@ -651,7 +671,6 @@ func (membermodel MemberModel) GetMemberProfile(Email string, profileId int, pro
 	}
 	return tblmember, nil
 }
-
 func (membermodel MemberModel) AllMemberCount(DB *gorm.DB) (count int64, err error) {
 
 	if err := DB.Table("tbl_members").Where("is_deleted = 0 ").Count(&count).Error; err != nil {
@@ -707,6 +726,26 @@ func (membermodel MemberModel) FlexibleMemberProfileUpdate(memberProfileData map
 func (membermodel MemberModel) MemberPasswordUpdate(memberData TblMember, memberId int, DB *gorm.DB) error {
 
 	if err := DB.Table("tbl_members").Where("is_deleted = 0 and id = ?", memberId).UpdateColumns(map[string]interface{}{"password": memberData.Password, "modified_by": memberData.ModifiedBy, "modified_on": memberData.ModifiedOn}).Error; err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+func (membermodel MemberModel) GetMemberSettings(DB *gorm.DB) (membersetting TblMemberSetting, err error) {
+
+	if err := DB.Table("tbl_member_settings").First(&membersetting).Error; err != nil {
+
+		return TblMemberSetting{}, err
+	}
+
+	return membersetting, nil
+}
+
+func (membermodel MemberModel) UpdateMemberSetting(membersetting map[string]interface{}, DB *gorm.DB) error {
+
+	if err := DB.Table("tbl_member_settings").Where("id=1").Updates(membersetting).Error; err != nil {
 
 		return err
 	}

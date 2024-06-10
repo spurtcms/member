@@ -1,9 +1,10 @@
 package member
 
 import (
-	"golang.org/x/crypto/bcrypt"
 	"strings"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/google/uuid"
 	"github.com/spurtcms/member/migration"
@@ -363,13 +364,13 @@ func (member *Member) CheckProfileSlug(profileSlug string, profileID int) (TblMe
 	return TblMemberProfile{}, nil
 }
 
-func (member *Member) GetMemberAndProfileData(EmailId string, profileId int, profileSlug string) (Tblmember, error) {
+func (member *Member) GetMemberAndProfileData(memberId int, emailid string, profileId int, profileSlug string) (Tblmember, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return Tblmember{}, AuthErr
 	}
 
-	profile, err := Membermodel.GetMemberProfile(EmailId, profileId, profileSlug, member.DB)
+	profile, err := Membermodel.GetMemberProfile(memberId, emailid, profileId, profileSlug, member.DB)
 	if err != nil {
 		return Tblmember{}, err
 	}
@@ -490,4 +491,41 @@ func (member *Member) MemberPasswordUpdate(newPassword, confirmPassword, oldPass
 
 	return nil
 
+}
+
+// Get member settings
+func (member *Member) GetMemberSettings() (TblMemberSetting, error) {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+		return TblMemberSetting{}, AuthErr
+	}
+
+	membersetttings, err := Membermodel.GetMemberSettings(member.DB)
+
+	if err != nil {
+		return TblMemberSetting{}, err
+	}
+
+	return membersetttings, nil
+}
+
+// set member settings
+func (member *Member) SetMemberSettings(membersett MemberSettings) error {
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+		return AuthErr
+	}
+
+	var updatedetails = make(map[string]interface{})
+	updatedetails["member_login"] = membersett.MemberLogin
+	updatedetails["allow_registration"] = membersett.AllowRegistration
+	updatedetails["notification_users"] = membersett.NotificationUsers
+	updatedetails["modified_by"] = membersett.ModifiedBy
+	updatedetails["modified_on"], _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	if err := Membermodel.UpdateMemberSetting(updatedetails, member.DB); err != nil {
+		return err
+	}
+
+	return nil
 }
