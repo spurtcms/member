@@ -188,6 +188,9 @@ func (member *Member) UpdateMemberProfile(Mc MemberprofilecreationUpdation) erro
 	memberprof.CompanyLogo = Mc.CompanyLogo
 	memberprof.ProfileName = Mc.ProfileName
 	memberprof.ProfileSlug = Mc.ProfileSlug
+	memberprof.SeoTitle = Mc.SeoTitle
+	memberprof.SeoDescription = Mc.SeoDescription
+	memberprof.SeoKeyword = Mc.SeoKeyword
 	memberprof.About = Mc.About
 	memberprof.Linkedin = Mc.LinkedIn
 	memberprof.Twitter = Mc.Twitter
@@ -219,6 +222,8 @@ func (member *Member) DeleteMember(id int, modifiedBy int) error {
 	dmember.DeletedBy = modifiedBy
 
 	err := Membermodel.DeleteMember(&dmember, id, member.DB)
+
+	Membermodel.DeleteMemberProfile(id, modifiedBy, dmember.DeletedOn, member.DB)
 
 	if err != nil {
 

@@ -642,7 +642,7 @@ func (membermodel MemberModel) CheckProfileSlug(profileSlug string, DB *gorm.DB)
 	return tblprofile, nil
 }
 
-func (membermodel MemberModel) GetMemberProfile(memberId int,emailid string, profileId int, profileSlug string, DB *gorm.DB) (tblmember Tblmember, err error) {
+func (membermodel MemberModel) GetMemberProfile(memberId int, emailid string, profileId int, profileSlug string, DB *gorm.DB) (tblmember Tblmember, err error) {
 
 	query := DB.Table("tbl_members").Preload("TblMemberProfile")
 
@@ -650,15 +650,15 @@ func (membermodel MemberModel) GetMemberProfile(memberId int,emailid string, pro
 
 		query = query.Where("is_deleted = 0 and id = ?", memberId)
 
-	}else if emailid != ""{
+	} else if emailid != "" {
 
 		query = query.Where("is_deleted = 0 and email = ?", emailid)
 
-	}else if profileSlug != "" {
+	} else if profileSlug != "" {
 
 		query = query.Where("is_deleted = 0 and id = (select member_id from tbl_member_profiles where is_deleted = 0 and profile_slug=?)", profileSlug)
 
-	}else if profileId != 0 {
+	} else if profileId != 0 {
 
 		query = query.Where("is_deleted = 0 and id = (select member_id from tbl_member_profiles where is_deleted = 0 and id=?)", profileId)
 
@@ -746,6 +746,17 @@ func (membermodel MemberModel) GetMemberSettings(DB *gorm.DB) (membersetting Tbl
 func (membermodel MemberModel) UpdateMemberSetting(membersetting map[string]interface{}, DB *gorm.DB) error {
 
 	if err := DB.Table("tbl_member_settings").Where("id=1").Updates(membersetting).Error; err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+func (membermodel MemberModel) DeleteMemberProfile(memberid int, deletedby int, deletedOn time.Time, DB *gorm.DB) error {
+
+	if err := DB.Table("tbl_member_profiles").Where("member_id=?", memberid).UpdateColumns(map[string]interface{}{
+		"is_deleted": 1, "deleted_by": deletedby, "deleted_on": deletedOn}).Error; err != nil {
 
 		return err
 	}
