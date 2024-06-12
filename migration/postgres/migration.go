@@ -1,6 +1,5 @@
 package postgres
 
-
 import (
 	"time"
 
@@ -33,6 +32,7 @@ type TblMember struct {
 	IsActive         int       `gorm:"type:integer"`
 	ProfileImage     string    `gorm:"type:character varying"`
 	ProfileImagePath string    `gorm:"type:character varying"`
+	StorageType      string    `gorm:"type:character varying"`
 	LastLogin        int       `gorm:"type:integer"`
 	MemberGroupId    int       `gorm:"type:integer"`
 	Password         string    `gorm:"type:character varying"`
@@ -56,6 +56,7 @@ type TblMemberProfile struct {
 	ProfileName     string            `gorm:"type:character varying"`
 	ProfileSlug     string            `gorm:"type:character varying"`
 	CompanyLogo     string            `gorm:"type:character varying"`
+	StorageType     string            `gorm:"type:character varying"`
 	CompanyName     string            `gorm:"type:character varying"`
 	CompanyLocation string            `gorm:"type:character varying"`
 	About           string            `gorm:"type:character varying"`
@@ -92,7 +93,6 @@ type TblMemberNotesHighlights struct {
 	IsDeleted               int               `gorm:"type:integer"`
 }
 
-
 type TblMemberSetting struct {
 	Id                int       `gorm:"primaryKey;auto_increment;"`
 	AllowRegistration int       `gorm:"type:int"`
@@ -105,6 +105,6 @@ type TblMemberSetting struct {
 // MigrateTable creates this package related tables in your database
 func MigrateTables(db *gorm.DB) {
 
-	db.AutoMigrate(&TblMemberGroup{}, &TblMember{}, &TblMemberNotesHighlights{}, &TblMemberProfile{},&TblMemberSetting{})
+	db.AutoMigrate(&TblMemberGroup{}, &TblMember{}, &TblMemberNotesHighlights{}, &TblMemberProfile{}, &TblMemberSetting{})
 
 }

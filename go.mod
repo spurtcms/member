@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/spurtcms/auth v0.0.6
+	github.com/spurtcms/auth v0.0.8
 	github.com/spurtcms/team-roles v0.0.5
 	golang.org/x/crypto v0.21.0
 	gorm.io/datatypes v1.2.0

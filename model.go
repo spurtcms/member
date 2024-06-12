@@ -47,6 +47,7 @@ type MemberCreationUpdation struct {
 	Username         string
 	Password         string
 	GroupId          int
+	StorageType      string
 }
 
 type MemberGroupCreationUpdation struct {
@@ -76,6 +77,7 @@ type MemberprofilecreationUpdation struct {
 	SeoTitle        string
 	SeoDescription  string
 	SeoKeyword      string
+	StorageType     string
 }
 
 type TblMemberGroup struct {
@@ -103,6 +105,7 @@ type TblMember struct {
 	IsActive         int
 	ProfileImage     string
 	ProfileImagePath string
+	StorageType      string
 	LastLogin        int
 	MemberGroupId    int
 	Password         string
@@ -126,6 +129,7 @@ type TblMemberProfile struct {
 	ProfileName     string
 	ProfileSlug     string
 	CompanyLogo     string
+	StorageType     string
 	CompanyName     string
 	CompanyLocation string
 	About           string
@@ -172,6 +176,7 @@ type Tblmember struct {
 	IsActive         int
 	ProfileImage     string
 	ProfileImagePath string
+	StorageType      string
 	LastLogin        int
 	IsDeleted        int
 	DeletedOn        time.Time `gorm:"DEFAULT:NULL"`
@@ -274,8 +279,7 @@ func (membermodel MemberModel) MemberGroupCreate(membergroup *TblMemberGroup, DB
 // Member list
 func (membermodel MemberModel) MembersList(limit int, offset int, filter Filter, flag bool, DB *gorm.DB) (member []Tblmember, Total_Member int64, err error) {
 
-	query := DB.Table("tbl_members").Select("tbl_members.id,tbl_members.uuid,tbl_members.member_group_id,tbl_members.first_name,tbl_members.last_name,tbl_members.email,tbl_members.mobile_no,tbl_members.profile_image,tbl_members.profile_image_path,tbl_members.created_on,tbl_members.created_by,tbl_members.modified_on,tbl_members.modified_by,tbl_members.is_active,tbl_members.is_deleted,tbl_members.deleted_on,tbl_members.deleted_by,tbl_member_groups.name as group_name").
-		Joins("inner join tbl_member_groups on tbl_members.member_group_id = tbl_member_groups.id").Joins("inner join tbl_member_profiles on tbl_members.id = tbl_member_profiles.member_id").Where("tbl_members.is_deleted=?", 0).Order("id desc")
+	query := DB.Table("tbl_members").Select("tbl_members.id,tbl_members.uuid,tbl_members.member_group_id,tbl_members.first_name,tbl_members.last_name,tbl_members.email,tbl_members.mobile_no,tbl_members.profile_image,tbl_members.profile_image_path,tbl_members.created_on,tbl_members.created_by,tbl_members.modified_on,tbl_members.modified_by,tbl_members.is_active,tbl_members.is_deleted,tbl_members.deleted_on,tbl_members.deleted_by,tbl_member_groups.name as group_name,tbl_members.storage_type").Joins("inner join tbl_member_groups on tbl_members.member_group_id = tbl_member_groups.id").Joins("inner join tbl_member_profiles on tbl_members.id = tbl_member_profiles.member_id").Where("tbl_members.is_deleted=?", 0).Order("id desc")
 
 	if membermodel.DataAccess == 1 {
 
@@ -642,7 +646,7 @@ func (membermodel MemberModel) CheckProfileSlug(profileSlug string, DB *gorm.DB)
 	return tblprofile, nil
 }
 
-func (membermodel MemberModel) GetMemberProfile(memberId int, emailid string, profileId int, profileSlug string, DB *gorm.DB) (tblmember Tblmember, err error) {
+func (membermodel MemberModel) GetMemberProfile(memberId int,emailid string, profileId int, profileSlug string, DB *gorm.DB) (tblmember Tblmember, err error) {
 
 	query := DB.Table("tbl_members").Preload("TblMemberProfile")
 
@@ -650,15 +654,15 @@ func (membermodel MemberModel) GetMemberProfile(memberId int, emailid string, pr
 
 		query = query.Where("is_deleted = 0 and id = ?", memberId)
 
-	} else if emailid != "" {
+	}else if emailid != ""{
 
 		query = query.Where("is_deleted = 0 and email = ?", emailid)
 
-	} else if profileSlug != "" {
+	}else if profileSlug != "" {
 
 		query = query.Where("is_deleted = 0 and id = (select member_id from tbl_member_profiles where is_deleted = 0 and profile_slug=?)", profileSlug)
 
-	} else if profileId != 0 {
+	}else if profileId != 0 {
 
 		query = query.Where("is_deleted = 0 and id = (select member_id from tbl_member_profiles where is_deleted = 0 and id=?)", profileId)
 

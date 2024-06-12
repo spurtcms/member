@@ -32,6 +32,7 @@ type TblMember struct {
 	IsActive         int       `gorm:"type:int"`
 	ProfileImage     string    `gorm:"type:varchar(255)"`
 	ProfileImagePath string    `gorm:"type:varchar(255)"`
+	StorageType      string    `gorm:"type:varchar(255)"`
 	LastLogin        int       `gorm:"type:int"`
 	MemberGroupId    int       `gorm:"type:int"`
 	Password         string    `gorm:"type:varchar(255)"`
@@ -71,6 +72,7 @@ type TblMemberProfile struct {
 	ProfileName     string            `gorm:"type:varchar(255)"`
 	ProfileSlug     string            `gorm:"type:varchar(255)"`
 	CompanyLogo     string            `gorm:"type:varchar(255)"`
+	StorageType     string            `gorm:"type:varchar(255)"`
 	CompanyName     string            `gorm:"type:varchar(255)"`
 	CompanyLocation string            `gorm:"type:varchar(255)"`
 	About           string            `gorm:"type:varchar(255)"`
@@ -91,7 +93,6 @@ type TblMemberProfile struct {
 	DeletedOn       time.Time         `gorm:"type:datetime;DEFAULT:NULL"`
 }
 
-
 type TblMemberSetting struct {
 	Id                int       `gorm:"primaryKey;auto_increment;"`
 	AllowRegistration int       `gorm:"type:int"`
@@ -104,6 +105,6 @@ type TblMemberSetting struct {
 // MigrateTable creates this package related tables in your database
 func MigrateTables(db *gorm.DB) {
 
-	db.AutoMigrate(&TblMemberGroup{}, &TblMember{}, &TblMemberNotesHighlights{}, &TblMemberProfile{},&TblMemberSetting{})
+	db.AutoMigrate(&TblMemberGroup{}, &TblMember{}, &TblMemberNotesHighlights{}, &TblMemberProfile{}, &TblMemberSetting{})
 
 }

@@ -91,7 +91,7 @@ func (member *Member) CreateMember(Mc MemberCreationUpdation) (Tblmember, error)
 	}
 	cmember.CreatedBy = Mc.CreatedBy
 	cmember.CreatedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
-
+	cmember.StorageType = Mc.StorageType
 	err := Membermodel.MemberCreate(&cmember, member.DB)
 	if err != nil {
 
@@ -129,8 +129,8 @@ func (member *Member) UpdateMember(Mc MemberCreationUpdation, id int) error {
 		hash_pass := hashingPassword(password)
 		umember.Password = hash_pass
 	}
-
 	umember.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+	umember.StorageType = Mc.StorageType
 	err := Membermodel.UpdateMember(&umember, member.DB)
 	if err != nil {
 
@@ -162,6 +162,7 @@ func (member *Member) CreateMemberProfile(Mc MemberprofilecreationUpdation) erro
 	memberprof.ClaimStatus = Mc.ClaimStatus
 	memberprof.CreatedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 	memberprof.CreatedBy = Mc.ModifiedBy
+	memberprof.StorageType = Mc.StorageType
 	err2 := Membermodel.CreateMemberProfile(&memberprof, member.DB)
 	if err2 != nil {
 
@@ -198,6 +199,7 @@ func (member *Member) UpdateMemberProfile(Mc MemberprofilecreationUpdation) erro
 	memberprof.ClaimStatus = Mc.ClaimStatus
 	memberprof.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 	memberprof.ModifiedBy = Mc.ModifiedBy
+	memberprof.StorageType = Mc.StorageType
 	err2 := Membermodel.MemberprofileUpdate(&memberprof, Mc.ProfileId, member.DB)
 
 	if err2 != nil {
@@ -369,13 +371,13 @@ func (member *Member) CheckProfileSlug(profileSlug string, profileID int) (TblMe
 	return TblMemberProfile{}, nil
 }
 
-func (member *Member) GetMemberAndProfileData(memberId int, emailid string, profileId int, profileSlug string) (Tblmember, error) {
+func (member *Member) GetMemberAndProfileData(memberId int,emailid string, profileId int, profileSlug string) (Tblmember, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return Tblmember{}, AuthErr
 	}
 
-	profile, err := Membermodel.GetMemberProfile(memberId, emailid, profileId, profileSlug, member.DB)
+	profile, err := Membermodel.GetMemberProfile(memberId,emailid, profileId, profileSlug, member.DB)
 	if err != nil {
 		return Tblmember{}, err
 	}
