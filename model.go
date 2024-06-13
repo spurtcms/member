@@ -8,12 +8,13 @@ import (
 )
 
 type Filter struct {
-	Keyword   string
-	Category  string
-	Status    string
-	FromDate  string
-	ToDate    string
-	FirstName string
+	Keyword       string
+	Category      string
+	Status        string
+	FromDate      string
+	ToDate        string
+	FirstName     string
+	MemberProfile bool
 }
 
 type MemberGroupListReq struct {
@@ -289,7 +290,7 @@ func (membermodel MemberModel) MembersList(limit int, offset int, filter Filter,
 
 	if filter.Keyword != "" {
 
-		query = query.Where("(LOWER(TRIM(tbl_members.first_name)) LIKE LOWER(TRIM(?))"+" OR LOWER(TRIM(tbl_members.last_name)) LIKE LOWER(TRIM(?))"+"OR LOWER(TRIM(tbl_member_profiles.company_name)) LIKE LOWER(TRIM(?))"+" OR LOWER(TRIM(tbl_member_groups.name)) LIKE LOWER(TRIM(?)))"+" AND tbl_members.is_deleted=0"+" AND tbl_member_groups.is_deleted=0", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%")
+		query = query.Where("LOWER(TRIM(tbl_members.first_name)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_members.last_name)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_member_profiles.company_name)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_member_groups.name)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_members.email)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_members.mobile_no)) LIKE LOWER(TRIM(?))  OR LOWER(TRIM(tbl_member_profiles.profile_slug)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_member_profiles.company_location)) LIKE LOWER(TRIM(?)) AND tbl_members.is_deleted=0 AND tbl_member_groups.is_deleted=0", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%","%"+filter.Keyword+"%")
 
 	}
 
@@ -646,7 +647,7 @@ func (membermodel MemberModel) CheckProfileSlug(profileSlug string, DB *gorm.DB)
 	return tblprofile, nil
 }
 
-func (membermodel MemberModel) GetMemberProfile(memberId int,emailid string, profileId int, profileSlug string, DB *gorm.DB) (tblmember Tblmember, err error) {
+func (membermodel MemberModel) GetMemberProfile(memberId int, emailid string, profileId int, profileSlug string, DB *gorm.DB) (tblmember Tblmember, err error) {
 
 	query := DB.Table("tbl_members").Preload("TblMemberProfile")
 
@@ -654,15 +655,15 @@ func (membermodel MemberModel) GetMemberProfile(memberId int,emailid string, pro
 
 		query = query.Where("is_deleted = 0 and id = ?", memberId)
 
-	}else if emailid != ""{
+	} else if emailid != "" {
 
 		query = query.Where("is_deleted = 0 and email = ?", emailid)
 
-	}else if profileSlug != "" {
+	} else if profileSlug != "" {
 
 		query = query.Where("is_deleted = 0 and id = (select member_id from tbl_member_profiles where is_deleted = 0 and profile_slug=?)", profileSlug)
 
-	}else if profileId != 0 {
+	} else if profileId != 0 {
 
 		query = query.Where("is_deleted = 0 and id = (select member_id from tbl_member_profiles where is_deleted = 0 and id=?)", profileId)
 
