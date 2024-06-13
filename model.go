@@ -290,7 +290,7 @@ func (membermodel MemberModel) MembersList(limit int, offset int, filter Filter,
 
 	if filter.Keyword != "" {
 
-		query = query.Where("LOWER(TRIM(tbl_members.first_name)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_members.last_name)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_member_profiles.company_name)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_member_groups.name)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_members.email)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_members.mobile_no)) LIKE LOWER(TRIM(?))  OR LOWER(TRIM(tbl_member_profiles.profile_slug)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_member_profiles.company_location)) LIKE LOWER(TRIM(?)) AND tbl_members.is_deleted=0 AND tbl_member_groups.is_deleted=0", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%","%"+filter.Keyword+"%")
+		query = query.Where("LOWER(TRIM(tbl_members.first_name)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_members.last_name)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_member_profiles.company_name)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_member_groups.name)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_members.email)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_members.mobile_no)) LIKE LOWER(TRIM(?))  OR LOWER(TRIM(tbl_member_profiles.profile_slug)) LIKE LOWER(TRIM(?)) OR LOWER(TRIM(tbl_member_profiles.company_location)) LIKE LOWER(TRIM(?)) AND tbl_members.is_deleted=0 AND tbl_member_groups.is_deleted=0", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%", "%"+filter.Keyword+"%")
 
 	}
 
@@ -353,7 +353,7 @@ func (membermodel MemberModel) UpdateMember(member *Tblmember, DB *gorm.DB) erro
 
 	} else {
 
-		query.UpdateColumns(map[string]interface{}{"first_name": member.FirstName, "last_name": member.LastName, "member_group_id": member.MemberGroupId, "email": member.Email, "username": member.Username, "mobile_no": member.MobileNo, "is_active": member.IsActive, "modified_on": member.ModifiedOn, "modified_by": member.ModifiedBy, "profile_image": member.ProfileImage, "profile_image_path": member.ProfileImagePath, "password": member.Password})
+		query.UpdateColumns(map[string]interface{}{"first_name": member.FirstName, "last_name": member.LastName, "member_group_id": member.MemberGroupId, "email": member.Email, "username": member.Username, "mobile_no": member.MobileNo, "is_active": member.IsActive, "modified_on": member.ModifiedOn, "modified_by": member.ModifiedBy, "profile_image": member.ProfileImage, "profile_image_path": member.ProfileImagePath, "password": member.Password, "storage_type": member.StorageType})
 	}
 	return nil
 }
@@ -380,7 +380,7 @@ func (membermodel MemberModel) MemberprofileUpdate(memberprof *TblMemberProfile,
 
 	} else {
 
-		query.UpdateColumns(map[string]interface{}{"profile_name": memberprof.ProfileName, "profile_slug": memberprof.ProfileSlug, "company_name": memberprof.CompanyName, "company_logo": memberprof.CompanyLogo, "company_location": memberprof.CompanyLocation, "about": memberprof.About, "seo_title": memberprof.SeoTitle, "seo_description": memberprof.SeoDescription, "seo_keyword": memberprof.SeoKeyword, "profile_page": memberprof.ProfilePage, "twitter": memberprof.Twitter, "linkedin": memberprof.Linkedin, "website": memberprof.Website, "claim_status": memberprof.ClaimStatus, "modified_by": memberprof.ModifiedBy, "modified_on": memberprof.ModifiedOn})
+		query.UpdateColumns(map[string]interface{}{"profile_name": memberprof.ProfileName, "profile_slug": memberprof.ProfileSlug, "company_name": memberprof.CompanyName, "company_logo": memberprof.CompanyLogo, "company_location": memberprof.CompanyLocation, "about": memberprof.About, "seo_title": memberprof.SeoTitle, "seo_description": memberprof.SeoDescription, "seo_keyword": memberprof.SeoKeyword, "profile_page": memberprof.ProfilePage, "twitter": memberprof.Twitter, "linkedin": memberprof.Linkedin, "website": memberprof.Website, "claim_status": memberprof.ClaimStatus, "modified_by": memberprof.ModifiedBy, "modified_on": memberprof.ModifiedOn, "storage_type": memberprof.StorageType})
 
 	}
 
