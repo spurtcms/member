@@ -32,6 +32,9 @@ func (member *Member) ListMemberGroup(listreq MemberGroupListReq) (membergroup [
 		return []Tblmembergroup{}, 0, AuthErr
 	}
 
+	Membermodel.Userid = member.UserId
+	Membermodel.DataAccess = member.DataAccess
+
 	_, membercounts, _ := Membermodel.MemberGroupList(MemberGroupListReq{Limit: 0, Offset: 0, Keyword: listreq.Keyword, ActiveGroupsOnly: listreq.ActiveGroupsOnly}, member.DB)
 
 	membergrouplist, _, _ := Membermodel.MemberGroupList(listreq, member.DB)

@@ -33,6 +33,9 @@ func (member *Member) ListMembers(offset int, limit int, filter Filter, flag boo
 		return []Tblmember{}, 0, AuthErr
 	}
 
+	Membermodel.Userid = member.UserId
+	Membermodel.DataAccess = member.DataAccess
+
 	memberlist, _, _ := Membermodel.MembersList(limit, offset, filter, flag, member.DB)
 
 	_, Total_users, _ := Membermodel.MembersList(0, 0, filter, flag, member.DB)
@@ -371,13 +374,13 @@ func (member *Member) CheckProfileSlug(profileSlug string, profileID int) (TblMe
 	return TblMemberProfile{}, nil
 }
 
-func (member *Member) GetMemberAndProfileData(memberId int,emailid string, profileId int, profileSlug string) (Tblmember, error) {
+func (member *Member) GetMemberAndProfileData(memberId int, emailid string, profileId int, profileSlug string) (Tblmember, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return Tblmember{}, AuthErr
 	}
 
-	profile, err := Membermodel.GetMemberProfile(memberId,emailid, profileId, profileSlug, member.DB)
+	profile, err := Membermodel.GetMemberProfile(memberId, emailid, profileId, profileSlug, member.DB)
 	if err != nil {
 		return Tblmember{}, err
 	}
