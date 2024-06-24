@@ -282,7 +282,7 @@ func (membermodel MemberModel) MemberGroupCreate(membergroup *TblMemberGroup, DB
 // Member list
 func (membermodel MemberModel) MembersList(limit int, offset int, filter Filter, flag bool, DB *gorm.DB) (member []Tblmember, Total_Member int64, err error) {
 
-	query := DB.Table("tbl_members").Select("tbl_members.id,tbl_members.uuid,tbl_members.member_group_id,tbl_members.first_name,tbl_members.last_name,tbl_members.email,tbl_members.mobile_no,tbl_members.profile_image,tbl_members.profile_image_path,tbl_members.created_on,tbl_members.created_by,tbl_members.modified_on,tbl_members.modified_by,tbl_members.is_active,tbl_members.is_deleted,tbl_members.deleted_on,tbl_members.deleted_by,tbl_member_groups.name as group_name,tbl_members.storage_type").Joins("inner join tbl_member_groups on tbl_members.member_group_id = tbl_member_groups.id").Joins("inner join tbl_member_profiles on tbl_members.id = tbl_member_profiles.member_id").Where("tbl_members.is_deleted=?", 0).Order("id desc")
+	query := DB.Table("tbl_members").Select("tbl_members.id,tbl_members.uuid,tbl_members.member_group_id,tbl_members.first_name,tbl_members.last_name,tbl_members.email,tbl_members.mobile_no,tbl_members.profile_image,tbl_members.profile_image_path,tbl_members.created_on,tbl_members.created_by,tbl_members.modified_on,tbl_members.modified_by,tbl_members.is_active,tbl_members.is_deleted,tbl_members.deleted_on,tbl_members.deleted_by,tbl_member_groups.name as group_name,tbl_members.storage_type").Joins("left join tbl_member_groups on tbl_members.member_group_id = tbl_member_groups.id").Joins("inner join tbl_member_profiles on tbl_members.id = tbl_member_profiles.member_id").Where("tbl_members.is_deleted=?", 0).Order("id desc")
 
 	if membermodel.DataAccess == 1 {
 
@@ -508,7 +508,7 @@ func (membermodel MemberModel) GetMemberDetailsByMemberId(MemberDetails *TblMemb
 // Get Member Details
 func (membermodel MemberModel) MemberDetails(member *Tblmember, memberid int, DB *gorm.DB) error {
 
-	if err := DB.Table("tbl_members").Select("tbl_members.*,tbl_member_groups.name as group_name").Joins("inner join tbl_member_groups on tbl_member_groups.id = tbl_members.member_group_id").Where("tbl_members.id=?", memberid).First(&member).Error; err != nil {
+	if err := DB.Table("tbl_members").Select("tbl_members.*,tbl_member_groups.name as group_name").Joins("left join tbl_member_groups on tbl_member_groups.id = tbl_members.member_group_id").Where("tbl_members.id=?", memberid).First(&member).Error; err != nil {
 		return err
 
 	}
@@ -769,4 +769,23 @@ func (membermodel MemberModel) DeleteMemberProfile(memberid int, deletedby int, 
 	}
 
 	return nil
+}
+
+// Remove member group in member
+func (membermodel MemberModel) RemoveMemberGroupInMember(id int, ids []int, DB *gorm.DB) error {
+	if id != 0 {
+		if err := DB.Debug().Table("tbl_members").Where("member_group_id=?", id).UpdateColumns(map[string]interface{}{"member_group_id": 1}).Error; err != nil {
+
+			return err
+
+		}
+	} else {
+		if err := DB.Table("tbl_members").Where("member_group_id in (?)", ids).UpdateColumns(map[string]interface{}{"member_group_id":1}).Error; err != nil {
+
+			return err
+	
+		}
+	}
+	return nil
+
 }

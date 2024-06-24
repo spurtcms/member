@@ -145,14 +145,16 @@ func (member *Member) DeleteMemberGroup(id int, modifiedBy int) error {
 	}
 
 	var Tblmembergroup Tblmembergroup
-
 	Tblmembergroup.ModifiedBy = modifiedBy
-
 	err := Membermodel.DeleteMemberGroup(&Tblmembergroup, id, member.DB)
-
+	sterr := Membermodel.RemoveMemberGroupInMember(id, []int{}, member.DB)
 	if err != nil {
 
 		return err
+	}
+	if sterr != nil {
+
+		return sterr
 	}
 
 	return nil
@@ -235,10 +237,16 @@ func (member *Member) MultiSelectedMemberDeletegroup(Memberid []int, modifiedby 
 	tblmembergroup.IsDeleted = 1
 
 	err := Membermodel.MultiSelectedMemberDeletegroup(&tblmembergroup, Memberid, member.DB)
-
-	if err != nil {
+	srerr := Membermodel.RemoveMemberGroupInMember(0, Memberid, member.DB)
+	
+	if err != nil{
 
 		return false, err
+	}
+
+	if srerr != nil{
+
+		return false, srerr
 	}
 
 	return true, nil
