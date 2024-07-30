@@ -37,7 +37,7 @@ func DBSetup() (*gorm.DB, error) {
 	if err != nil {
 
 		return nil, err
-		
+
 	}
 
 	return db, nil
@@ -63,7 +63,7 @@ func TestListMemberGroup(t *testing.T) {
 
 	Auth.VerifyToken(token, SecretKey)
 
-	permisison, _ := Auth.IsGranted("Members Group", auth.CRUD)
+	permisison, _ := Auth.IsGranted("Members Group", auth.CRUD, TenantId)
 
 	member := MemberSetup(Config{
 		DB:               db,
@@ -73,7 +73,7 @@ func TestListMemberGroup(t *testing.T) {
 	})
 	if permisison {
 
-		membergroup, count, err := member.ListMemberGroup(MemberGroupListReq{Limit: 10, Offset: 0})
+		membergroup, count, err := member.ListMemberGroup(MemberGroupListReq{Limit: 10, Offset: 0}, TenantId)
 
 		if err != nil {
 
@@ -109,7 +109,7 @@ func TestCreateMemberGroup(t *testing.T) {
 
 	Auth.VerifyToken(token, SecretKey)
 
-	permisison, _ := Auth.IsGranted("Members Group", auth.CRUD)
+	permisison, _ := Auth.IsGranted("Members Group", auth.CRUD, TenantId)
 
 	member := MemberSetup(Config{
 		DB:               db,
@@ -119,7 +119,7 @@ func TestCreateMemberGroup(t *testing.T) {
 	})
 	if permisison {
 
-		err := member.CreateMemberGroup(MemberGroupCreation{"sports","indian team",1})
+		err := member.CreateMemberGroup(MemberGroupCreation{"sports", "indian team", 1}, TenantId)
 
 		if err != nil {
 

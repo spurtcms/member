@@ -28,7 +28,7 @@ func TestListMembers(t *testing.T) {
 
 	Auth.VerifyToken(token, SecretKey)
 
-	permisison, _ := Auth.IsGranted("Members", auth.CRUD)
+	permisison, _ := Auth.IsGranted("Members", auth.CRUD,TenantId)
 
 	member := MemberSetup(Config{
 		DB:               db,
@@ -38,14 +38,14 @@ func TestListMembers(t *testing.T) {
 	})
 	if permisison {
 
-		memberlist,count,err := member.ListMembers(10,0,Filter{},false)
+		memberlist, count, err := member.ListMembers(10, 0, Filter{}, false, 1)
 
 		if err != nil {
 
 			panic(err)
 		}
 
-		fmt.Println(memberlist,count)
+		fmt.Println(memberlist, count)
 	} else {
 
 		log.Println("permissions enabled not initialised")
@@ -74,7 +74,7 @@ func TestCreateMember(t *testing.T) {
 
 	Auth.VerifyToken(token, SecretKey)
 
-	permisison, _ := Auth.IsGranted("Members", auth.CRUD)
+	permisison, _ := Auth.IsGranted("Members", auth.CRUD,TenantId)
 
 	member := MemberSetup(Config{
 		DB:               db,
@@ -84,7 +84,7 @@ func TestCreateMember(t *testing.T) {
 	})
 	if permisison {
 
-		memberdata,err := member.CreateMember(MemberCreationUpdation{FirstName: "tester",Username: "Tester",Email:"tester@gmail.com",MobileNo:"9080706050",Password: "Tester@123"})
+		memberdata, err := member.CreateMember(MemberCreationUpdation{FirstName: "tester", Username: "Tester", Email: "tester@gmail.com", MobileNo: "9080706050", Password: "Tester@123"})
 
 		if err != nil {
 
@@ -120,7 +120,7 @@ func TestUpdateMember(t *testing.T) {
 
 	Auth.VerifyToken(token, SecretKey)
 
-	permisison, _ := Auth.IsGranted("Members", auth.CRUD)
+	permisison, _ := Auth.IsGranted("Members", auth.CRUD,TenantId)
 
 	member := MemberSetup(Config{
 		DB:               db,
@@ -130,7 +130,7 @@ func TestUpdateMember(t *testing.T) {
 	})
 	if permisison {
 
-		err := member.UpdateMember(MemberCreationUpdation{FirstName: "tester",Username: "Tester",Email:"tester@gmail.com",MobileNo:"9080706050",Password: "Tester@123"},1)
+		err := member.UpdateMember(MemberCreationUpdation{FirstName: "tester", Username: "Tester", Email: "tester@gmail.com", MobileNo: "9080706050", Password: "Tester@123"}, 1, 1)
 
 		if err != nil {
 
@@ -166,7 +166,7 @@ func TestCreateMemberProfile(t *testing.T) {
 
 	Auth.VerifyToken(token, SecretKey)
 
-	permisison, _ := Auth.IsGranted("Members", auth.CRUD)
+	permisison, _ := Auth.IsGranted("Members", auth.CRUD,TenantId)
 
 	member := MemberSetup(Config{
 		DB:               db,
@@ -176,7 +176,7 @@ func TestCreateMemberProfile(t *testing.T) {
 	})
 	if permisison {
 
-		err := member.CreateMemberProfile(MemberprofilecreationUpdation{MemberId: 1,ProfileId: 5,CompanyName: "CMN",})
+		err := member.CreateMemberProfile(MemberprofilecreationUpdation{MemberId: 1, ProfileId: 5, CompanyName: "CMN"})
 
 		if err != nil {
 
@@ -191,6 +191,7 @@ func TestCreateMemberProfile(t *testing.T) {
 	}
 
 }
+
 // test updatememberprofile function
 func TestUpdateMemberProfile(t *testing.T) {
 
@@ -211,7 +212,7 @@ func TestUpdateMemberProfile(t *testing.T) {
 
 	Auth.VerifyToken(token, SecretKey)
 
-	permisison, _ := Auth.IsGranted("Members", auth.CRUD)
+	permisison, _ := Auth.IsGranted("Members", auth.CRUD,TenantId)
 
 	member := MemberSetup(Config{
 		DB:               db,
@@ -221,7 +222,7 @@ func TestUpdateMemberProfile(t *testing.T) {
 	})
 	if permisison {
 
-		err := member.UpdateMemberProfile(MemberprofilecreationUpdation{ProfileId: 5,CompanyName: "CMNs",})
+		err := member.UpdateMemberProfile(MemberprofilecreationUpdation{ProfileId: 5, CompanyName: "CMNs"}, 1)
 
 		if err != nil {
 
@@ -257,7 +258,7 @@ func TestDeleteMember(t *testing.T) {
 
 	Auth.VerifyToken(token, SecretKey)
 
-	permisison, _ := Auth.IsGranted("Members", auth.CRUD)
+	permisison, _ := Auth.IsGranted("Members", auth.CRUD,TenantId)
 
 	member := MemberSetup(Config{
 		DB:               db,
@@ -267,7 +268,7 @@ func TestDeleteMember(t *testing.T) {
 	})
 	if permisison {
 
-		err := member.DeleteMember(18,1)
+		err := member.DeleteMember(18, 1, 1)
 
 		if err != nil {
 

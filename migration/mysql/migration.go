@@ -20,6 +20,7 @@ type TblMemberGroup struct {
 	ModifiedBy  int       `gorm:"DEFAULT:NULL;type:int"`
 	DeletedBy   int       `gorm:"type:int"`
 	DeletedOn   time.Time `gorm:"type:datetime;DEFAULT:NULL"`
+	TenantId    int       `gorm:"type:int;"`
 }
 
 type TblMember struct {
@@ -47,6 +48,7 @@ type TblMember struct {
 	CreatedBy        int       `gorm:"type:int"`
 	ModifiedOn       time.Time `gorm:"type:datetime;DEFAULT:NULL"`
 	ModifiedBy       int       `gorm:"DEFAULT:NULL;type:int"`
+	TenantId         int       `gorm:"type:int;"`
 }
 
 type TblMemberNotesHighlights struct {
@@ -63,6 +65,7 @@ type TblMemberNotesHighlights struct {
 	DeletedBy               int               `gorm:"type:int"`
 	DeletedOn               time.Time         `gorm:"type:datetime;DEFAULT:NULL"`
 	IsDeleted               int               `gorm:"type:int"`
+	TenantId                int               `gorm:"type:int;"`
 }
 
 type TblMemberProfile struct {
@@ -91,6 +94,7 @@ type TblMemberProfile struct {
 	IsDeleted       int               `gorm:"DEFAULT:0"`
 	DeletedBy       int               `gorm:"DEFAULT:NULL;type:int"`
 	DeletedOn       time.Time         `gorm:"type:datetime;DEFAULT:NULL"`
+	TenantId        int               `gorm:"type:int;"`
 }
 
 type TblMemberSetting struct {
@@ -100,6 +104,7 @@ type TblMemberSetting struct {
 	ModifiedBy        int       `gorm:"type:integer"`
 	ModifiedOn        time.Time `gorm:"type:datetime;DEFAULT:NULL"`
 	NotificationUsers string    `gorm:"type:varchar(255)"`
+	TenantId          int       `gorm:"type:int;"`
 }
 
 // MigrateTable creates this package related tables in your database

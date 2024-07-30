@@ -2,6 +2,8 @@ package member
 
 import (
 	"errors"
+	"os"
+	"strconv"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -11,6 +13,7 @@ var (
 	ErrorPermission    = errors.New("permissions enabled not initialised")
 	ErrorEmpty         = errors.New("given some values is empty")
 	ErrorPassMissMatch = errors.New("new passowrd and confirmation password mismatched")
+	TenantId, _        = strconv.Atoi(os.Getenv("Tenant_ID"))
 )
 
 func AuthandPermission(member *Member) error {
