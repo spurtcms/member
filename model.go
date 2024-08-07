@@ -239,7 +239,7 @@ var Membermodel MemberModel
 // Member Group List
 func (membermodel MemberModel) MemberGroupList(listre MemberGroupListReq, DB *gorm.DB, tenantid int) (membergroup []Tblmembergroup, TotalMemberGroup int64, err error) {
 
-	query := DB.Table("tbl_member_groups").Where("tenant_id=?", tenantid).Scopes(IsDeleted).Order("id desc")
+	query := DB.Table("tbl_member_groups").Where("(tenant_id is NULL or tenant_id=?)", tenantid).Scopes(IsDeleted).Order("id desc")
 
 	if membermodel.DataAccess == 1 {
 
@@ -287,7 +287,7 @@ func (membermodel MemberModel) MemberGroupCreate(membergroup *TblMemberGroup, DB
 // Member list
 func (membermodel MemberModel) MembersList(limit int, offset int, filter Filter, flag bool, DB *gorm.DB, tenantid int) (member []Tblmember, Total_Member int64, err error) {
 
-	query := DB.Table("tbl_members").Select("tbl_members.id,tbl_members.uuid,tbl_members.member_group_id,tbl_members.first_name,tbl_members.last_name,tbl_members.email,tbl_members.mobile_no,tbl_members.profile_image,tbl_members.profile_image_path,tbl_members.created_on,tbl_members.created_by,tbl_members.modified_on,tbl_members.modified_by,tbl_members.is_active,tbl_members.is_deleted,tbl_members.deleted_on,tbl_members.deleted_by,tbl_member_groups.name as group_name,tbl_members.storage_type").Joins("left join tbl_member_groups on tbl_members.member_group_id = tbl_member_groups.id").Joins("inner join tbl_member_profiles on tbl_members.id = tbl_member_profiles.member_id").Where("tbl_members.is_deleted=? and tbl_members.tenant_id=?", 0, tenantid).Order("id desc")
+	query := DB.Table("tbl_members").Select("tbl_members.id,tbl_members.uuid,tbl_members.member_group_id,tbl_members.first_name,tbl_members.last_name,tbl_members.email,tbl_members.mobile_no,tbl_members.profile_image,tbl_members.profile_image_path,tbl_members.created_on,tbl_members.created_by,tbl_members.modified_on,tbl_members.modified_by,tbl_members.is_active,tbl_members.is_deleted,tbl_members.deleted_on,tbl_members.deleted_by,tbl_member_groups.name as group_name,tbl_members.storage_type").Joins("left join tbl_member_groups on tbl_members.member_group_id = tbl_member_groups.id").Joins("inner join tbl_member_profiles on tbl_members.id = tbl_member_profiles.member_id").Where("tbl_members.is_deleted=? and (tbl_members.tenant_id is NULL or tbl_members.tenant_id=?)", 0, tenantid).Order("id desc")
 
 	if membermodel.DataAccess == 1 {
 
@@ -352,7 +352,7 @@ func (membermodel MemberModel) UpdateMemberProfile(memberprof *TblMemberProfile,
 // Update Member
 func (membermodel MemberModel) UpdateMember(member *Tblmember, DB *gorm.DB, tenantid int) error {
 
-	query := DB.Table("tbl_members").Where("id=? and tenant_id=?", member.Id, tenantid)
+	query := DB.Table("tbl_members").Where("id=? and (tenant_id is NULL or tenant_id=?)", member.Id, tenantid)
 
 	if member.Password == "" && member.ProfileImage == "" && member.ProfileImagePath == "" {
 
@@ -370,7 +370,7 @@ func (membermodel MemberModel) UpdateMember(member *Tblmember, DB *gorm.DB, tena
 func (membermodel MemberModel) GetMemberProfileByMemberId(memberprof *TblMemberProfile, id int, DB *gorm.DB, tenantid int) (err error) {
 
 	// DB.Table("tbl_member_profiles").Where("id=? and tenant_id=?", id, tenantid)
-	if err := DB.Table("tbl_member_profiles").Where("member_id=? and tenant_id=?", id, tenantid).First(&memberprof).Error; err != nil {
+	if err := DB.Table("tbl_member_profiles").Where("member_id=? and (tenant_id is NULL or tenant_id=?)", id, tenantid).First(&memberprof).Error; err != nil {
 
 		return err
 	}
@@ -381,7 +381,7 @@ func (membermodel MemberModel) GetMemberProfileByMemberId(memberprof *TblMemberP
 // update membercompanyprofile
 func (membermodel MemberModel) MemberprofileUpdate(memberprof *TblMemberProfile, id int, DB *gorm.DB, tenantid int) error {
 
-	query := DB.Table("tbl_member_profiles").Where("id=? and tenant_id=?", id, tenantid)
+	query := DB.Table("tbl_member_profiles").Where("id=? and (tenant_id is NULL or tenant_id=?)", id, tenantid)
 
 	if memberprof.CompanyLogo == "" {
 
@@ -399,7 +399,7 @@ func (membermodel MemberModel) MemberprofileUpdate(memberprof *TblMemberProfile,
 // Delete Member
 func (membermodel MemberModel) DeleteMember(member *Tblmember, id int, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Table("tbl_members").Where("id=? and tenant_id=?", id, tenantid).UpdateColumns(map[string]interface{}{"is_deleted": 1, "deleted_on": member.DeletedOn, "deleted_by": member.DeletedBy}).Error; err != nil {
+	if err := DB.Table("tbl_members").Where("id=? and (tenant_id is NULL or tenant_id=?)", id, tenantid).UpdateColumns(map[string]interface{}{"is_deleted": 1, "deleted_on": member.DeletedOn, "deleted_by": member.DeletedBy}).Error; err != nil {
 
 		return err
 
@@ -411,12 +411,12 @@ func (membermodel MemberModel) DeleteMember(member *Tblmember, id int, DB *gorm.
 func (membermodel MemberModel) CheckEmailInMember(member *TblMember, email string, userid int, DB *gorm.DB, tenantid int) error {
 
 	if userid == 0 {
-		if err := DB.Table("tbl_members").Where("LOWER(TRIM(email))=LOWER(TRIM(?)) and is_deleted=0 and tenant_id=?", email, tenantid).First(&member).Error; err != nil {
+		if err := DB.Table("tbl_members").Where("LOWER(TRIM(email))=LOWER(TRIM(?)) and is_deleted=0 and (tenant_id is NULL or tenant_id=?)", email, tenantid).First(&member).Error; err != nil {
 
 			return err
 		}
 	} else {
-		if err := DB.Table("tbl_members").Where("LOWER(TRIM(email))=LOWER(TRIM(?)) and id not in (?) and is_deleted = 0 and tenant_id=?", email, userid, tenantid).First(&member).Error; err != nil {
+		if err := DB.Table("tbl_members").Where("LOWER(TRIM(email))=LOWER(TRIM(?)) and id not in (?) and is_deleted = 0 and (tenant_id is NULL or tenant_id=?)", email, userid, tenantid).First(&member).Error; err != nil {
 
 			return err
 		}
@@ -429,25 +429,13 @@ func (membermodel MemberModel) CheckNumberInMember(member *TblMember, number str
 
 	if userid == 0 {
 
-
-
-
-
-
-
-
-
-
-
-
-
-		if err := DB.Table("tbl_members").Where("mobile_no = ? and tenant_id=? and is_deleted = 0", number, tenantid).First(&member).Error; err != nil {
+		if err := DB.Table("tbl_members").Where("mobile_no = ? and (tenant_id is NULL or tenant_id=?) and is_deleted = 0", number, tenantid).First(&member).Error; err != nil {
 
 			return err
 		}
 	} else {
 
-		if err := DB.Table("tbl_members").Where("mobile_no = ? and id not in (?) and tenant_id=? and is_deleted=0", number, userid, tenantid).First(&member).Error; err != nil {
+		if err := DB.Table("tbl_members").Where("mobile_no = ? and id not in (?) and (tenant_id is NULL or tenant_id=?) and is_deleted=0", number, userid, tenantid).First(&member).Error; err != nil {
 
 			return err
 		}
@@ -461,13 +449,13 @@ func (membermodel MemberModel) CheckNameInMember(userid int, name string, DB *go
 
 	if userid == 0 {
 
-		if err := DB.Table("tbl_members").Where("LOWER(TRIM(username))=LOWER(TRIM(?)) and tenant_id=? and is_deleted=0", name, tenantid).First(&member).Error; err != nil {
+		if err := DB.Table("tbl_members").Where("LOWER(TRIM(username))=LOWER(TRIM(?)) and (tenant_id is NULL or tenant_id=?) and is_deleted=0", name, tenantid).First(&member).Error; err != nil {
 
 			return Tblmember{}, err
 		}
 	} else {
 
-		if err := DB.Table("tbl_members").Where("LOWER(TRIM(username))=LOWER(TRIM(?)) and id not in (?) and tenant_id=?   and is_deleted=0", name, userid, tenantid).First(&member).Error; err != nil {
+		if err := DB.Table("tbl_members").Where("LOWER(TRIM(username))=LOWER(TRIM(?)) and id not in (?) and (tenant_id is NULL or tenant_id=?)   and is_deleted=0", name, userid, tenantid).First(&member).Error; err != nil {
 
 			return Tblmember{}, err
 		}
@@ -479,7 +467,7 @@ func (membermodel MemberModel) CheckNameInMember(userid int, name string, DB *go
 // Member Group Update
 func (membermodel MemberModel) MemberGroupUpdate(membergroup *Tblmembergroup, id int, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Table("tbl_member_groups").Where("id=? and tenant_id=? ", id, tenantid).Updates(TblMemberGroup{Name: membergroup.Name, Slug: membergroup.Slug, Description: membergroup.Description, Id: membergroup.Id, ModifiedOn: membergroup.ModifiedOn, ModifiedBy: membergroup.ModifiedBy}).Error; err != nil {
+	if err := DB.Table("tbl_member_groups").Where("id=? and (tenant_id is NULL or tenant_id=?) ", id, tenantid).Updates(TblMemberGroup{Name: membergroup.Name, Slug: membergroup.Slug, Description: membergroup.Description, Id: membergroup.Id, ModifiedOn: membergroup.ModifiedOn, ModifiedBy: membergroup.ModifiedBy}).Error; err != nil {
 
 		return err
 	}
@@ -490,7 +478,7 @@ func (membermodel MemberModel) MemberGroupUpdate(membergroup *Tblmembergroup, id
 // Member Group Delete
 func (membermodel MemberModel) DeleteMemberGroup(membergroup *Tblmembergroup, id int, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Debug().Table("tbl_member_groups").Where("id=? and tenant_id=?", id, tenantid).UpdateColumns(map[string]interface{}{"is_deleted": 1, "modified_by": membergroup.ModifiedBy}).Error; err != nil {
+	if err := DB.Debug().Table("tbl_member_groups").Where("id=? and (tenant_id is NULL or tenant_id=?)", id, tenantid).UpdateColumns(map[string]interface{}{"is_deleted": 1, "modified_by": membergroup.ModifiedBy}).Error; err != nil {
 
 		return err
 
@@ -503,7 +491,7 @@ func (membermodel MemberModel) GetGroupData(membergroup []Tblmembergroup, DB *go
 
 	var membergrouplist []Tblmembergroup
 
-	if err := DB.Table("tbl_member_groups").Where("is_deleted = 0 and is_active = 1 and tenant_id=?", tenantid).Order("name").Find(&membergrouplist).Error; err != nil {
+	if err := DB.Table("tbl_member_groups").Where("is_deleted = 0 and is_active = 1 and (tenant_id is NULL or tenant_id=?)", tenantid).Order("name").Find(&membergrouplist).Error; err != nil {
 
 		return []Tblmembergroup{}, err
 
@@ -516,7 +504,7 @@ func (membermodel MemberModel) GetGroupData(membergroup []Tblmembergroup, DB *go
 // get member details
 func (membermodel MemberModel) GetMemberDetailsByMemberId(MemberDetails *TblMember, memberId int, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Table("tbl_members").Where("is_deleted=0 and id = ? and tenant_id=?", memberId, tenantid).First(&MemberDetails).Error; err != nil {
+	if err := DB.Table("tbl_members").Where("is_deleted=0 and id = ? and (tenant_id is NULL or tenant_id=?)", memberId, tenantid).First(&MemberDetails).Error; err != nil {
 
 		return err
 	}
@@ -527,7 +515,7 @@ func (membermodel MemberModel) GetMemberDetailsByMemberId(MemberDetails *TblMemb
 // Get Member Details
 func (membermodel MemberModel) MemberDetails(member *Tblmember, memberid int, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Table("tbl_members").Select("tbl_members.*,tbl_member_groups.name as group_name").Joins("left join tbl_member_groups on tbl_member_groups.id = tbl_members.member_group_id").Where("tbl_members.id=? and tbl_members.tenant_id=?", memberid, tenantid).First(&member).Error; err != nil {
+	if err := DB.Table("tbl_members").Select("tbl_members.*,tbl_member_groups.name as group_name").Joins("left join tbl_member_groups on tbl_member_groups.id = tbl_members.member_group_id").Where("tbl_members.id=? and (tbl_members.tenant_id is NULL or tbl_members.tenant_id=?)", memberid, tenantid).First(&member).Error; err != nil {
 		return err
 
 	}
@@ -537,7 +525,7 @@ func (membermodel MemberModel) MemberDetails(member *Tblmember, memberid int, DB
 
 func (membermodel MemberModel) CheckProfileSlugInMember(member *TblMemberProfile, name string, memberid int, DB *gorm.DB, tenantid int) error {
 
-	query := DB.Table("tbl_member_profiles").Where("profile_slug = ? and tenant_id=? and is_deleted=0", name, tenantid)
+	query := DB.Table("tbl_member_profiles").Where("profile_slug = ? and (tenant_id is NULL or tenant_id=?) and is_deleted=0", name, tenantid)
 
 	if memberid > 0 {
 
@@ -555,7 +543,7 @@ func (membermodel MemberModel) CheckProfileSlugInMember(member *TblMemberProfile
 // Member  IsActive Function
 func (membermodel MemberModel) MemberStatus(memberstatus TblMember, memberid int, status int, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Table("tbl_members").Where("id=? and tenant_id=?", memberid, tenantid).UpdateColumns(map[string]interface{}{"is_active": status, "modified_by": memberstatus.ModifiedBy, "modified_on": memberstatus.ModifiedOn}).Error; err != nil {
+	if err := DB.Table("tbl_members").Where("id=? and (tenant_id is NULL or tenant_id=?)", memberid, tenantid).UpdateColumns(map[string]interface{}{"is_active": status, "modified_by": memberstatus.ModifiedBy, "modified_on": memberstatus.ModifiedOn}).Error; err != nil {
 
 		return err
 	}
@@ -568,13 +556,13 @@ func (membermodel MemberModel) MultiSelectedMemberDelete(member *TblMember, id [
 
 	return DB.Transaction(func(tx *gorm.DB) error {
 
-		if err := DB.Model(&member).Where("id in (?) and tenant_id=?", id, tenantid).UpdateColumns(map[string]interface{}{"is_deleted": 1, "deleted_on": member.DeletedOn, "deleted_by": member.DeletedBy}).Error; err != nil {
+		if err := DB.Model(&member).Where("id in (?) and (tenant_id is NULL or tenant_id=?)", id, tenantid).UpdateColumns(map[string]interface{}{"is_deleted": 1, "deleted_on": member.DeletedOn, "deleted_by": member.DeletedBy}).Error; err != nil {
 
 			return err
 
 		}
 
-		if err := DB.Table("tbl_member_profiles").Where("id in (?) and tenant_id=?", id, tenantid).UpdateColumns(map[string]interface{}{"is_deleted": 1, "deleted_on": member.DeletedOn, "deleted_by": member.DeletedBy}).Error; err != nil {
+		if err := DB.Table("tbl_member_profiles").Where("id in (?) and (tenant_id is NULL or tenant_id=?)", id, tenantid).UpdateColumns(map[string]interface{}{"is_deleted": 1, "deleted_on": member.DeletedOn, "deleted_by": member.DeletedBy}).Error; err != nil {
 
 			return err
 
@@ -587,7 +575,7 @@ func (membermodel MemberModel) MultiSelectedMemberDelete(member *TblMember, id [
 
 func (membermodel MemberModel) MultiMemberIsActive(memberstatus *TblMember, memberid []int, status int, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Table("tbl_members").Where("id in (?) and tenant_id=?", memberid, tenantid).UpdateColumns(map[string]interface{}{"is_active": status, "modified_by": memberstatus.ModifiedBy, "modified_on": memberstatus.ModifiedOn}).Error; err != nil {
+	if err := DB.Table("tbl_members").Where("id in (?) and (tenant_id is NULL or tenant_id=?)", memberid, tenantid).UpdateColumns(map[string]interface{}{"is_active": status, "modified_by": memberstatus.ModifiedBy, "modified_on": memberstatus.ModifiedOn}).Error; err != nil {
 
 		return err
 	}
@@ -598,7 +586,7 @@ func (membermodel MemberModel) MultiMemberIsActive(memberstatus *TblMember, memb
 // Member la IsActive Function
 func (membermodel MemberModel) MemberGroupIsActive(memberstatus *Tblmembergroup, memberid int, status int, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Table("tbl_member_groups").Where("id=? and tenant_id=?", memberid, tenantid).UpdateColumns(map[string]interface{}{"is_active": status, "modified_by": memberstatus.ModifiedBy, "modified_on": memberstatus.ModifiedOn}).Error; err != nil {
+	if err := DB.Table("tbl_member_groups").Where("id=? and (tenant_id is NULL or tenant_id=?)", memberid, tenantid).UpdateColumns(map[string]interface{}{"is_active": status, "modified_by": memberstatus.ModifiedBy, "modified_on": memberstatus.ModifiedOn}).Error; err != nil {
 
 		return err
 	}
@@ -611,13 +599,13 @@ func (membermodel MemberModel) CheckNameInMemberGroup(member *Tblmembergroup, us
 
 	if userid == 0 {
 
-		if err := DB.Table("tbl_member_groups").Where("LOWER(TRIM(name))=LOWER(TRIM(?)) and tenant_id=? and is_deleted=0", name, tenantid).First(&member).Error; err != nil {
+		if err := DB.Table("tbl_member_groups").Where("LOWER(TRIM(name))=LOWER(TRIM(?)) and (tenant_id is NULL or tenant_id=?) and is_deleted=0", name, tenantid).First(&member).Error; err != nil {
 
 			return err
 		}
 	} else {
 
-		if err := DB.Table("tbl_member_groups").Where("LOWER(TRIM(name))=LOWER(TRIM(?)) and id not in (?) tenant_id=? and is_deleted=0", name, userid, tenantid).First(&member).Error; err != nil {
+		if err := DB.Table("tbl_member_groups").Where("LOWER(TRIM(name))=LOWER(TRIM(?)) and id not in (?) and (tenant_id is NULL or tenant_id=?) and is_deleted=0", name, userid, tenantid).First(&member).Error; err != nil {
 
 			return err
 		}
@@ -629,7 +617,7 @@ func (membermodel MemberModel) CheckNameInMemberGroup(member *Tblmembergroup, us
 // selected member group delete
 func (membermodel MemberModel) MultiSelectedMemberDeletegroup(member *Tblmembergroup, id []int, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Table("tbl_member_groups").Where("id in (?) and tenant_id=?", id, tenantid).UpdateColumns(map[string]interface{}{"is_deleted": member.IsDeleted, "deleted_on": member.DeletedOn, "deleted_by": member.DeletedBy}).Error; err != nil {
+	if err := DB.Table("tbl_member_groups").Where("id in (?) and (tenant_id is NULL or tenant_id=?)", id, tenantid).UpdateColumns(map[string]interface{}{"is_deleted": member.IsDeleted, "deleted_on": member.DeletedOn, "deleted_by": member.DeletedBy}).Error; err != nil {
 
 		return err
 
@@ -640,7 +628,7 @@ func (membermodel MemberModel) MultiSelectedMemberDeletegroup(member *Tblmemberg
 // selected member group status change
 func (membermodel MemberModel) MultiMemberGroupIsActive(memberstatus *TblMemberGroup, memberid []int, status int, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Table("tbl_member_groups").Where("id in (?) and tenant_id=?", memberid, tenantid).UpdateColumns(map[string]interface{}{"is_active": status, "modified_by": memberstatus.ModifiedBy, "modified_on": memberstatus.ModifiedOn}).Error; err != nil {
+	if err := DB.Table("tbl_member_groups").Where("id in (?) and (tenant_id is NULL or tenant_id=?)", memberid, tenantid).UpdateColumns(map[string]interface{}{"is_active": status, "modified_by": memberstatus.ModifiedBy, "modified_on": memberstatus.ModifiedOn}).Error; err != nil {
 
 		return err
 	}
@@ -660,7 +648,7 @@ func (membermodel MemberModel) CreateMemberProfile(memberprof *TblMemberProfile,
 
 func (membermodel MemberModel) CheckProfileSlug(profileSlug string, DB *gorm.DB, tenantid int) (tblprofile TblMemberProfile, err error) {
 
-	if err := DB.Table("tbl_member_profiles").Select("id").Where("is_deleted = 0 and LOWER(profile_slug) = ? and tenant_id=?", profileSlug, tenantid).First(&tblprofile).Error; err != nil {
+	if err := DB.Table("tbl_member_profiles").Select("id").Where("is_deleted = 0 and LOWER(profile_slug) = ? and (tenant_id is NULL or tenant_id=?)", profileSlug, tenantid).First(&tblprofile).Error; err != nil {
 
 		return tblprofile, err
 	}
@@ -674,19 +662,19 @@ func (membermodel MemberModel) GetMemberProfile(memberId int, emailid string, pr
 
 	if memberId != 0 {
 
-		query = query.Where("is_deleted = 0 and id = ? and tenant_id=?", memberId, tenantid)
+		query = query.Where("is_deleted = 0 and id = ? and (tenant_id is NULL or tenant_id=?)", memberId, tenantid)
 
 	} else if emailid != "" {
 
-		query = query.Where("is_deleted = 0 and email = ? and tenant_id=?", emailid, tenantid)
+		query = query.Where("is_deleted = 0 and email = ? and (tenant_id is NULL or tenant_id=?)", emailid, tenantid)
 
 	} else if profileSlug != "" {
 
-		query = query.Where("tenant_id=? and is_deleted = 0 and id = (select member_id from tbl_member_profiles where is_deleted = 0 and profile_slug=?) ", tenantid, profileSlug)
+		query = query.Where("(tenant_id is NULL or tenant_id=?) and is_deleted = 0 and id = (select member_id from tbl_member_profiles where is_deleted = 0 and profile_slug=?) ", tenantid, profileSlug)
 
 	} else if profileId != 0 {
 
-		query = query.Where("tenant_id=? and is_deleted = 0 and id = (select member_id from tbl_member_profiles where is_deleted = 0 and id=?)", tenantid, profileId)
+		query = query.Where("(tenant_id is NULL or tenant_id=?) and is_deleted = 0 and id = (select member_id from tbl_member_profiles where is_deleted = 0 and id=?)", tenantid, profileId)
 
 	}
 
@@ -699,7 +687,7 @@ func (membermodel MemberModel) GetMemberProfile(memberId int, emailid string, pr
 }
 func (membermodel MemberModel) AllMemberCount(DB *gorm.DB, tenantid int) (count int64, err error) {
 
-	if err := DB.Table("tbl_members").Where("is_deleted = 0 and tenant_id=?", tenantid).Count(&count).Error; err != nil {
+	if err := DB.Table("tbl_members").Where("is_deleted = 0 and (tenant_id is NULL or tenant_id=?)", tenantid).Count(&count).Error; err != nil {
 
 		return 0, err
 	}
@@ -710,7 +698,7 @@ func (membermodel MemberModel) AllMemberCount(DB *gorm.DB, tenantid int) (count 
 
 func (membermodel MemberModel) NewmemberCount(DB *gorm.DB, tenantid int) (count int64, err error) {
 
-	if err := DB.Table("tbl_members").Where("tenant_id=? and is_deleted = 0 AND created_on >=?", tenantid, time.Now().AddDate(0, 0, -10)).Count(&count).Error; err != nil {
+	if err := DB.Table("tbl_members").Where("(tenant_id is NULL or tenant_id=?) and is_deleted = 0 AND created_on >=?", tenantid, time.Now().AddDate(0, 0, -10)).Count(&count).Error; err != nil {
 
 		return 0, err
 	}
@@ -720,7 +708,7 @@ func (membermodel MemberModel) NewmemberCount(DB *gorm.DB, tenantid int) (count 
 }
 func (membermodel MemberModel) ActiveMemberList(member []Tblmember, limit int, DB *gorm.DB, tenantid int) (members []Tblmember, err error) {
 
-	if err := DB.Table("tbl_members").Where("tenant_id=? and is_deleted=0 and last_login=1 AND login_time >=?", tenantid, time.Now().UTC().Add(-8*time.Hour).Format("2006-01-02 15:04:05")).Find(&members).Limit(limit).Error; err != nil {
+	if err := DB.Table("tbl_members").Where("(tenant_id is NULL or tenant_id=?) and is_deleted=0 and last_login=1 AND login_time >=?", tenantid, time.Now().UTC().Add(-8*time.Hour).Format("2006-01-02 15:04:05")).Find(&members).Limit(limit).Error; err != nil {
 
 		return []Tblmember{}, err
 
@@ -731,7 +719,7 @@ func (membermodel MemberModel) ActiveMemberList(member []Tblmember, limit int, D
 
 func (membermodel MemberModel) FlexibleMemberUpdate(memberData map[string]interface{}, memberid int, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Table("tbl_members").Where("is_deleted = 0 and id = ? and tenant_id=?", memberid, tenantid).UpdateColumns(memberData).Error; err != nil {
+	if err := DB.Table("tbl_members").Where("is_deleted = 0 and id = ? and (tenant_id is NULL or tenant_id=?)", memberid, tenantid).UpdateColumns(memberData).Error; err != nil {
 
 		return err
 	}
@@ -741,7 +729,7 @@ func (membermodel MemberModel) FlexibleMemberUpdate(memberData map[string]interf
 
 func (membermodel MemberModel) FlexibleMemberProfileUpdate(memberProfileData map[string]interface{}, memberid int, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Table("tbl_member_profiles").Where("is_deleted = 0 and member_id = ? and tenant_id=?", memberid, tenantid).UpdateColumns(memberProfileData).Error; err != nil {
+	if err := DB.Table("tbl_member_profiles").Where("is_deleted = 0 and member_id = ? and (tenant_id is NULL or tenant_id=?)", memberid, tenantid).UpdateColumns(memberProfileData).Error; err != nil {
 
 		return err
 	}
@@ -751,7 +739,7 @@ func (membermodel MemberModel) FlexibleMemberProfileUpdate(memberProfileData map
 
 func (membermodel MemberModel) MemberPasswordUpdate(memberData TblMember, memberId int, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Table("tbl_members").Where("is_deleted = 0 and id = ? and tenant_id=?", memberId, tenantid).UpdateColumns(map[string]interface{}{"password": memberData.Password, "modified_by": memberData.ModifiedBy, "modified_on": memberData.ModifiedOn}).Error; err != nil {
+	if err := DB.Table("tbl_members").Where("is_deleted = 0 and id = ? and (tenant_id is NULL or tenant_id=?)", memberId, tenantid).UpdateColumns(map[string]interface{}{"password": memberData.Password, "modified_by": memberData.ModifiedBy, "modified_on": memberData.ModifiedOn}).Error; err != nil {
 
 		return err
 	}
@@ -761,7 +749,7 @@ func (membermodel MemberModel) MemberPasswordUpdate(memberData TblMember, member
 
 func (membermodel MemberModel) GetMemberSettings(DB *gorm.DB, tenantid int) (membersetting TblMemberSetting, err error) {
 
-	if err := DB.Table("tbl_member_settings").Where("tenant_id=?", tenantid).First(&membersetting).Error; err != nil {
+	if err := DB.Table("tbl_member_settings").Where("(tenant_id is NULL or tenant_id=?)", tenantid).First(&membersetting).Error; err != nil {
 
 		return TblMemberSetting{}, err
 	}
@@ -771,7 +759,7 @@ func (membermodel MemberModel) GetMemberSettings(DB *gorm.DB, tenantid int) (mem
 
 func (membermodel MemberModel) UpdateMemberSetting(membersetting map[string]interface{}, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Table("tbl_member_settings").Where("id=1 and tenant_id=?").Updates(membersetting).Error; err != nil {
+	if err := DB.Table("tbl_member_settings").Where("id=1 and (tenant_id is NULL or tenant_id=?)").Updates(membersetting).Error; err != nil {
 
 		return err
 	}
@@ -781,7 +769,7 @@ func (membermodel MemberModel) UpdateMemberSetting(membersetting map[string]inte
 
 func (membermodel MemberModel) DeleteMemberProfile(memberid int, deletedby int, deletedOn time.Time, DB *gorm.DB, tenantid int) error {
 
-	if err := DB.Table("tbl_member_profiles").Where("member_id=? and tenant_id=?", memberid, tenantid).UpdateColumns(map[string]interface{}{
+	if err := DB.Table("tbl_member_profiles").Where("member_id=? and (tenant_id is NULL or tenant_id=?)", memberid, tenantid).UpdateColumns(map[string]interface{}{
 		"is_deleted": 1, "deleted_by": deletedby, "deleted_on": deletedOn}).Error; err != nil {
 
 		return err
@@ -793,13 +781,13 @@ func (membermodel MemberModel) DeleteMemberProfile(memberid int, deletedby int, 
 // Remove member group in member
 func (membermodel MemberModel) RemoveMemberGroupInMember(id int, ids []int, DB *gorm.DB, tenantid int) error {
 	if id != 0 {
-		if err := DB.Debug().Table("tbl_members").Where("member_group_id=? tenant_id=?", id, tenantid).UpdateColumns(map[string]interface{}{"member_group_id": 1}).Error; err != nil {
+		if err := DB.Debug().Table("tbl_members").Where("member_group_id=? (tenant_id is NULL or tenant_id=?)", id, tenantid).UpdateColumns(map[string]interface{}{"member_group_id": 1}).Error; err != nil {
 
 			return err
 
 		}
 	} else {
-		if err := DB.Table("tbl_members").Where("member_group_id in (?) and tenant_id=?", ids, tenantid).UpdateColumns(map[string]interface{}{"member_group_id": 1}).Error; err != nil {
+		if err := DB.Table("tbl_members").Where("member_group_id in (?) and (tenant_id is NULL or tenant_id=?)", ids, tenantid).UpdateColumns(map[string]interface{}{"member_group_id": 1}).Error; err != nil {
 
 			return err
 

@@ -102,7 +102,7 @@ type TblMemberSetting struct {
 	AllowRegistration int       `gorm:"type:int"`
 	MemberLogin       string    `gorm:"type:varchar(255)"`
 	ModifiedBy        int       `gorm:"type:integer"`
-	ModifiedOn        time.Time `gorm:"type:datetime;DEFAULT:NULL"`
+	ModifiedOn        time.Time `gorm:"type:timestamp without time zone;DEFAULT:NULL"`
 	NotificationUsers string    `gorm:"type:varchar(255)"`
 	TenantId          int       `gorm:"type:integer;"`
 }
