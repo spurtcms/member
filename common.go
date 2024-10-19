@@ -16,6 +16,8 @@ var (
 	TenantId, _        = strconv.Atoi(os.Getenv("Tenant_ID"))
 )
 
+
+// Basic auth and permission initialization
 func AuthandPermission(member *Member) error {
 
 	//check auth enable if enabled, use auth pkg otherwise it will return error
@@ -33,6 +35,7 @@ func AuthandPermission(member *Member) error {
 	return nil
 }
 
+// function to hash the secret passwords
 func hashingPassword(pass string) string {
 
 	passbyte, err := bcrypt.GenerateFromPassword([]byte(pass), 14)

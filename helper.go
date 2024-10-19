@@ -16,7 +16,7 @@ func (member *Member) CheckEmailInMember(id int, email string, tenantid int) (bo
 
 }
 
-// Check Number is already exits or not
+// function to Check Number is already exits or not
 func (member *Member) CheckNumberInMember(id int, number string,tenantid int) (bool, error) {
 
 	var cmember TblMember

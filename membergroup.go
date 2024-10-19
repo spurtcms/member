@@ -137,7 +137,7 @@ func (member *Member) UpdateMemberGroup(membergrpc MemberGroupCreationUpdation, 
 	return nil
 }
 
-// delete member
+// delete member group
 func (member *Member) DeleteMemberGroup(id int, modifiedBy int,tenantid int) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {

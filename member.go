@@ -435,6 +435,7 @@ func (member *Member) ActiveMemberList(limit int,tenantid int) (memberdata []Tbl
 
 }
 
+//Member flexible update functionality
 func (member *Member) MemberFlexibleUpdate(memberData map[string]interface{}, memberId, modifiedBy int,tenantid int) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
@@ -453,6 +454,7 @@ func (member *Member) MemberFlexibleUpdate(memberData map[string]interface{}, me
 
 }
 
+//Memeber profile flexible update
 func (member *Member) MemberProfileFlexibleUpdate(memberProfileData map[string]interface{}, memberId, modifiedBy int,tenantid int) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
@@ -470,6 +472,7 @@ func (member *Member) MemberProfileFlexibleUpdate(memberProfileData map[string]i
 	return nil
 }
 
+// Member password update functionality
 func (member *Member) MemberPasswordUpdate(newPassword, confirmPassword, oldPassword string, memberId, modifiedBy int,tenantid int) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
