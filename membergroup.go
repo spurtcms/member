@@ -278,3 +278,24 @@ func (member *Member) MultiSelectMembersgroupStatus(memberid []int, status int, 
 	return true, nil
 
 }
+
+func (member *Member) Membergroupcheckmember(memgrpid int,memgrpids []int, tenantid int) (bool, error) {
+
+	var memberchk TblMember
+
+	if AuthErr := AuthandPermission(member); AuthErr != nil {
+
+		return false, AuthErr
+	}
+	err := Membermodel.Checkmembergroup(&memberchk, memgrpid, memgrpids, member.DB, tenantid)
+
+	if err != nil {
+		return false, err
+	}
+
+	if memberchk.Id == 0 {
+
+		return false, nil
+	}
+	return true, nil
+}

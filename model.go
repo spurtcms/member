@@ -796,3 +796,17 @@ func (membermodel MemberModel) RemoveMemberGroupInMember(id int, ids []int, DB *
 	return nil
 
 }
+
+func (membermodel MemberModel) Checkmembergroup(member *TblMember, id int, ids []int, DB *gorm.DB, tenantid int) error {
+	
+	query:=DB.Table("tbl_members")
+	if id != 0 {
+		query=query.Where("member_group_id=? and tenant_id=?", id, tenantid)
+	}else{
+		query=query.Where("member_group_id in (?) and tenant_id=?", ids, tenantid)
+	}
+	if err :=query.First(&member).Error; err != nil {
+		return err
+	}
+	return nil
+}
