@@ -801,9 +801,9 @@ func (membermodel MemberModel) Checkmembergroup(member *TblMember, id int, ids [
 	
 	query:=DB.Table("tbl_members")
 	if id != 0 {
-		query=query.Where("member_group_id=? and tenant_id=?", id, tenantid)
+		query=query.Where("member_group_id=? and tenant_id=? and is_deleted = 0", id, tenantid)
 	}else{
-		query=query.Where("member_group_id in (?) and tenant_id=?", ids, tenantid)
+		query=query.Where("member_group_id in (?) and tenant_id=? and is_deleted = 0", ids, tenantid)
 	}
 	if err :=query.First(&member).Error; err != nil {
 		return err

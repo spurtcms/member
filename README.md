@@ -1,6 +1,6 @@
 # Member Package
 
-The 'Member' package grants website admin the authority to shape their online community through seamless member creation. Administrators hold the power to create members, transforming them into content consumers with exclusive access to tailored content. This streamlined process enables effortless audience management and curation, ensuring a personalized experience for each member within the website. 
+The 'Member' package grants website admin the authority to shape their online community through seamless member creation. Administrators hold the power to create members, transforming them into content consumers with exclusive access to tailored content. This streamlined process enables effortless audience management and curation, ensuring a personalized experience for each member within the website.
 
 ## Features
 
@@ -53,36 +53,35 @@ func main() {
 	if permisison {
 
 		//list membergroup
-		membergroup, count, err := members.ListMemberGroup(member.MemberGroupListReq{Limit: 10, Offset: 0})
-		fmt.Println(membergroup, count, err)
+		membergroup, count, err := member.ListMemberGroup(MemberGroupListReq{Limit: 10, Offset: 0}, 1)
+
+		if err != nil {
+
+			panic(err)
+		}
 
 		//create membergroup
-		cerr := members.CreateMemberGroup(member.MemberGroupCreation{Name: "Default Group", Description: "default group", CreatedBy: 1})
+		err := member.CreateMemberGroup(MemberGroupCreation{"sports", "indian team", 1}, 1)
 
-		if cerr != nil {
+		if err != nil {
 
-			fmt.Println(cerr)
+			panic(err)
 		}
 
 		//update membergroup
-		uerr := members.UpdateMemberGroup(member.MemberGroupCreationUpdation{
-			Name:        "Default",
-			Description: "default group2",
-			ModifiedBy:  1,
-			IsActive:    1,
-		}, 2)
+		err := member.UpdateMemberGroup(MemberGroupCreationUpdation{Name:"Default",Description: "default group2",ModifiedBy: 1,IsActive: 1},2,1)
 
-		if uerr != nil {
+		if err != nil {
 
-			fmt.Println(uerr)
+			panic(err)
 		}
 
 		// delete membergroup
-		derr := members.DeleteMemberGroup(2, 2)
+			err := member.DeleteMemberGroup(2,1,1)
 
-		if derr != nil {
+		if err != nil {
 
-			fmt.Println(derr)
+			panic(err)
 		}
 	}
 
@@ -91,38 +90,68 @@ func main() {
 	if cpermisison {
 
 		//members list
-		memberlist, count, err := members.ListMembers(10, 0, member.Filter{}, false)
+		memberlist, count, err := member.ListMembers(0, 10, Filter{}, false,1)
 		fmt.Println(memberlist, count, err)
 
 		//create member
-		memberdata, cerr := members.CreateMember(member.MemberCreationUpdation{
-			FirstName: "tester",
-			Username:  "Tester",
-			Email:     "tester@gmail.com",
-			Password:  "Tester@123",
-		})
+			memberdata, err := member.CreateMember(MemberCreationUpdation{
+			  FirstName: "tester",
+			  Username: "Tester",
+			  Email: "tester@gmail.com",
+			  MobileNo: "9080706050",
+			  Password: "Tester@123",
+			  TenantId: 1
+			})
 
 		fmt.Println(memberdata, cerr)
 
 		//update member
-		uerr := members.UpdateMember(member.MemberCreationUpdation{
-			FirstName: "tester",
-			Username:  "Tester",
-			Email:     "tester@gmail.com",
-			Password:  "Tester@123",
-		}, 1)
+				err := member.UpdateMember(MemberCreationUpdation{
+				FirstName: "testers",
+				Username: "Testers",
+				Email: "testers@gmail.com",
+				MobileNo: "9080706050",
+				Password: "Testers@123"},1, 1)
 
-		if uerr != nil {
 
-			fmt.Println(uerr)
+		if err != nil {
+
+			fmt.Println(err)
+		}
+
+
+		// create member profile
+
+		err := member.CreateMemberProfile(MemberprofilecreationUpdation{
+		         MemberId: 1,
+			     ProfileId: 5,
+				 CompanyName: "CMN",
+				 TenantId: 1
+				})
+
+		if err != nil {
+
+			panic(err)
+		}
+
+         // update member profile
+
+		 err := member.UpdateMemberProfile(MemberprofilecreationUpdation{
+		         ProfileId: 1,
+				 CompanyName: "CMNs"
+			   }, 1)
+
+		if err != nil {
+
+			panic(err)
 		}
 
 		//delete member
-		derr := members.DeleteMember(2, 1)
+		err := member.DeleteMember(1, 1, 1)
 
-		if derr != nil {
+		if err != nil {
 
-			fmt.Println(derr)
+			fmt.Println(err)
 		}
 
 	}
@@ -130,4 +159,4 @@ func main() {
 ```
 
 # Getting help
-If you encounter a problem with the package,please refer [Please refer [(https://www.spurtcms.com/documentation/cms-admin)] or you can create a new Issue in this repo[https://github.com/spurtcms/member/issues]. 
+If you encounter a problem with the package,please refer [Please refer [(https://www.spurtcms.com/documentation/cms-admin)] or you can create a new Issue in this repo[https://github.com/spurtcms/member/issues].
