@@ -26,7 +26,7 @@ func MemberSetup(config Config) *Member {
 }
 
 // list member
-func (member *Member) ListMembers(offset int, limit int, filter Filter, flag bool ,TenantId int) (memb []Tblmember, totoalmember int64, err error) {
+func (member *Member) ListMembers(offset int, limit int, filter Filter, flag bool, TenantId int) (memb []Tblmember, totoalmember int64, err error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -36,9 +36,9 @@ func (member *Member) ListMembers(offset int, limit int, filter Filter, flag boo
 	Membermodel.Userid = member.UserId
 	Membermodel.DataAccess = member.DataAccess
 
-	memberlist, _, _ := Membermodel.MembersList(limit, offset, filter, flag, member.DB,TenantId)
+	memberlist, _, _ := Membermodel.MembersList(limit, offset, filter, flag, member.DB, TenantId)
 
-	_, Total_users, _ := Membermodel.MembersList(0, 0, filter, flag, member.DB,TenantId)
+	_, Total_users, _ := Membermodel.MembersList(0, 0, filter, flag, member.DB, TenantId)
 
 	var memberlists []Tblmember
 
@@ -95,8 +95,8 @@ func (member *Member) CreateMember(Mc MemberCreationUpdation) (Tblmember, error)
 	cmember.CreatedBy = Mc.CreatedBy
 	cmember.CreatedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 	cmember.StorageType = Mc.StorageType
-	cmember.TenantId=Mc.TenantId
-	err := Membermodel.MemberCreate(&cmember, member.DB )
+	cmember.TenantId = Mc.TenantId
+	err := Membermodel.MemberCreate(&cmember, member.DB)
 	if err != nil {
 
 		return Tblmember{}, err
@@ -107,7 +107,7 @@ func (member *Member) CreateMember(Mc MemberCreationUpdation) (Tblmember, error)
 }
 
 // Update Member
-func (member *Member) UpdateMember(Mc MemberCreationUpdation, id int ,tenantid int) error {
+func (member *Member) UpdateMember(Mc MemberCreationUpdation, id int, tenantid int) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return AuthErr
@@ -135,7 +135,7 @@ func (member *Member) UpdateMember(Mc MemberCreationUpdation, id int ,tenantid i
 	}
 	umember.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 	umember.StorageType = Mc.StorageType
-	err := Membermodel.UpdateMember(&umember, member.DB,tenantid)
+	err := Membermodel.UpdateMember(&umember, member.DB, tenantid)
 	if err != nil {
 
 		return err
@@ -167,7 +167,7 @@ func (member *Member) CreateMemberProfile(Mc MemberprofilecreationUpdation) erro
 	memberprof.CreatedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 	memberprof.CreatedBy = Mc.ModifiedBy
 	memberprof.StorageType = Mc.StorageType
-	memberprof.TenantId=Mc.TenantId
+	memberprof.TenantId = Mc.TenantId
 	err2 := Membermodel.CreateMemberProfile(&memberprof, member.DB)
 	if err2 != nil {
 
@@ -178,7 +178,7 @@ func (member *Member) CreateMemberProfile(Mc MemberprofilecreationUpdation) erro
 }
 
 // update memberprofile
-func (member *Member) UpdateMemberProfile(Mc MemberprofilecreationUpdation,tenantid int) error {
+func (member *Member) UpdateMemberProfile(Mc MemberprofilecreationUpdation, tenantid int) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -205,8 +205,8 @@ func (member *Member) UpdateMemberProfile(Mc MemberprofilecreationUpdation,tenan
 	memberprof.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 	memberprof.ModifiedBy = Mc.ModifiedBy
 	memberprof.StorageType = Mc.StorageType
-	memberprof.TenantId=tenantid
-	err2 := Membermodel.MemberprofileUpdate(&memberprof, Mc.ProfileId, member.DB,tenantid)
+	memberprof.TenantId = tenantid
+	err2 := Membermodel.MemberprofileUpdate(&memberprof, Mc.ProfileId, member.DB, tenantid)
 
 	if err2 != nil {
 
@@ -217,7 +217,7 @@ func (member *Member) UpdateMemberProfile(Mc MemberprofilecreationUpdation,tenan
 }
 
 // delete member
-func (member *Member) DeleteMember(id int, modifiedBy int,tenantid int) error {
+func (member *Member) DeleteMember(id int, modifiedBy int, tenantid int) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -229,9 +229,9 @@ func (member *Member) DeleteMember(id int, modifiedBy int,tenantid int) error {
 	dmember.DeletedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 	dmember.DeletedBy = modifiedBy
 
-	err := Membermodel.DeleteMember(&dmember, id, member.DB,tenantid)
+	err := Membermodel.DeleteMember(&dmember, id, member.DB, tenantid)
 
-	Membermodel.DeleteMemberProfile(id, modifiedBy, dmember.DeletedOn, member.DB,tenantid)
+	Membermodel.DeleteMemberProfile(id, modifiedBy, dmember.DeletedOn, member.DB, tenantid)
 
 	if err != nil {
 
@@ -242,11 +242,11 @@ func (member *Member) DeleteMember(id int, modifiedBy int,tenantid int) error {
 }
 
 // Get member data
-func (member *Member) GetMemberDetails(id int,tenantid int) (members Tblmember, err error) {
+func (member *Member) GetMemberDetails(id int, tenantid int) (members Tblmember, err error) {
 
 	var memberdata Tblmember
 
-	err = Membermodel.MemberDetails(&memberdata, id, member.DB,tenantid)
+	err = Membermodel.MemberDetails(&memberdata, id, member.DB, tenantid)
 	if err != nil {
 
 		return Tblmember{}, err
@@ -257,7 +257,7 @@ func (member *Member) GetMemberDetails(id int,tenantid int) (members Tblmember, 
 }
 
 // Get memberprofile data
-func (member *Member) GetMemberProfileByMemberId(memberid int,tenantid int) (memberprofs TblMemberProfile, err error) {
+func (member *Member) GetMemberProfileByMemberId(memberid int, tenantid int) (memberprofs TblMemberProfile, err error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -265,7 +265,7 @@ func (member *Member) GetMemberProfileByMemberId(memberid int,tenantid int) (mem
 	}
 
 	var memberprof TblMemberProfile
-	err1 := Membermodel.GetMemberProfileByMemberId(&memberprof, memberid, member.DB,tenantid)
+	err1 := Membermodel.GetMemberProfileByMemberId(&memberprof, memberid, member.DB, tenantid)
 	if err1 != nil {
 
 		return TblMemberProfile{}, err1
@@ -276,7 +276,7 @@ func (member *Member) GetMemberProfileByMemberId(memberid int,tenantid int) (mem
 }
 
 // Check Number is already exits or not
-func (member *Member) CheckProfileSlugInMember(id int, number string,tenantid int) (bool, error) {
+func (member *Member) CheckProfileSlugInMember(id int, number string, tenantid int) (bool, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -284,7 +284,7 @@ func (member *Member) CheckProfileSlugInMember(id int, number string,tenantid in
 	}
 
 	var memberprof TblMemberProfile
-	err := Membermodel.CheckProfileSlugInMember(&memberprof, number, id, member.DB,tenantid)
+	err := Membermodel.CheckProfileSlugInMember(&memberprof, number, id, member.DB, tenantid)
 	if err != nil {
 		return false, err
 	}
@@ -303,7 +303,7 @@ func (member *Member) MemberStatus(memberid int, status int, modifiedby int, ten
 	memberstatus.ModifiedBy = modifiedby
 	memberstatus.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 
-	err := Membermodel.MemberStatus(memberstatus, memberid, status, member.DB,tenantid)
+	err := Membermodel.MemberStatus(memberstatus, memberid, status, member.DB, tenantid)
 	if err != nil {
 		return false, err
 	}
@@ -313,7 +313,7 @@ func (member *Member) MemberStatus(memberid int, status int, modifiedby int, ten
 }
 
 // multiselecte member delete
-func (member *Member) MultiSelectedMemberDelete(Memberid []int, modifiedby int,tenantid int) (bool, error) {
+func (member *Member) MultiSelectedMemberDelete(Memberid []int, modifiedby int, tenantid int) (bool, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return false, AuthErr
@@ -324,7 +324,7 @@ func (member *Member) MultiSelectedMemberDelete(Memberid []int, modifiedby int,t
 	members.DeletedBy = modifiedby
 	members.IsDeleted = 1
 
-	err := Membermodel.MultiSelectedMemberDelete(&members, Memberid, member.DB,tenantid)
+	err := Membermodel.MultiSelectedMemberDelete(&members, Memberid, member.DB, tenantid)
 	if err != nil {
 
 		return false, err
@@ -334,7 +334,7 @@ func (member *Member) MultiSelectedMemberDelete(Memberid []int, modifiedby int,t
 }
 
 // multiselecte member status change
-func (member *Member) MultiSelectMembersStatus(memberid []int, status int, modifiedby int,tenantid int) (bool, error) {
+func (member *Member) MultiSelectMembersStatus(memberid []int, status int, modifiedby int, tenantid int) (bool, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -345,7 +345,7 @@ func (member *Member) MultiSelectMembersStatus(memberid []int, status int, modif
 	memberStatus.ModifiedBy = modifiedby
 	memberStatus.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 
-	err := Membermodel.MultiMemberIsActive(&memberStatus, memberid, status, member.DB,tenantid)
+	err := Membermodel.MultiMemberIsActive(&memberStatus, memberid, status, member.DB, tenantid)
 	if err != nil {
 
 		return false, err
@@ -355,14 +355,14 @@ func (member *Member) MultiSelectMembersStatus(memberid []int, status int, modif
 
 }
 
-func (member *Member) CheckProfileSlug(profileSlug string, profileID int,tenantid int) (TblMemberProfile, error) {
+func (member *Member) CheckProfileSlug(profileSlug string, profileID int, tenantid int) (TblMemberProfile, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
 		return TblMemberProfile{}, AuthErr
 	}
 
-	profile, err := Membermodel.CheckProfileSlug(profileSlug, member.DB,tenantid)
+	profile, err := Membermodel.CheckProfileSlug(profileSlug, member.DB, tenantid)
 
 	if err != nil {
 		return TblMemberProfile{}, err
@@ -377,13 +377,13 @@ func (member *Member) CheckProfileSlug(profileSlug string, profileID int,tenanti
 	return TblMemberProfile{}, nil
 }
 
-func (member *Member) GetMemberAndProfileData(memberId int, emailid string, profileId int, profileSlug string,tenantid int) (Tblmember, error) {
+func (member *Member) GetMemberAndProfileData(memberId int, emailid string, profileId int, profileSlug string, tenantid int) (Tblmember, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return Tblmember{}, AuthErr
 	}
 
-	profile, err := Membermodel.GetMemberProfile(memberId, emailid, profileId, profileSlug, member.DB,tenantid)
+	profile, err := Membermodel.GetMemberProfile(memberId, emailid, profileId, profileSlug, member.DB, tenantid)
 	if err != nil {
 		return Tblmember{}, err
 	}
@@ -397,12 +397,12 @@ func (member *Member) DashboardMemberCount(tenantid int) (totalcount int, lastte
 		return 0, 0, AuthErr
 	}
 
-	allmembercount, err := Membermodel.AllMemberCount(member.DB,tenantid)
+	allmembercount, err := Membermodel.AllMemberCount(member.DB, tenantid)
 	if err != nil {
 		return 0, 0, err
 	}
 
-	Lmembercount, err := Membermodel.NewmemberCount(member.DB,tenantid)
+	Lmembercount, err := Membermodel.NewmemberCount(member.DB, tenantid)
 	if err != nil {
 		return 0, 0, err
 	}
@@ -411,7 +411,7 @@ func (member *Member) DashboardMemberCount(tenantid int) (totalcount int, lastte
 }
 
 // Active MemberList Function//
-func (member *Member) ActiveMemberList(limit int,tenantid int) (memberdata []Tblmember, err error) {
+func (member *Member) ActiveMemberList(limit int, tenantid int) (memberdata []Tblmember, err error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -419,7 +419,7 @@ func (member *Member) ActiveMemberList(limit int,tenantid int) (memberdata []Tbl
 	}
 
 	var members []Tblmember
-	activememlist, err := Membermodel.ActiveMemberList(members, limit, member.DB,tenantid)
+	activememlist, err := Membermodel.ActiveMemberList(members, limit, member.DB, tenantid)
 
 	var memberlist []Tblmember
 	for _, val := range activememlist {
@@ -435,8 +435,8 @@ func (member *Member) ActiveMemberList(limit int,tenantid int) (memberdata []Tbl
 
 }
 
-//Member flexible update functionality
-func (member *Member) MemberFlexibleUpdate(memberData map[string]interface{}, memberId, modifiedBy int,tenantid int) error {
+// Member flexible update functionality
+func (member *Member) MemberFlexibleUpdate(memberData map[string]interface{}, memberId, modifiedBy int, tenantid int) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return AuthErr
@@ -445,7 +445,7 @@ func (member *Member) MemberFlexibleUpdate(memberData map[string]interface{}, me
 	currentTime, _ := time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 	memberData["modified_on"] = currentTime
 	memberData["modified_by"] = modifiedBy
-	err := Membermodel.FlexibleMemberUpdate(memberData, memberId, member.DB,tenantid)
+	err := Membermodel.FlexibleMemberUpdate(memberData, memberId, member.DB, tenantid)
 	if err != nil {
 		return err
 	}
@@ -454,8 +454,8 @@ func (member *Member) MemberFlexibleUpdate(memberData map[string]interface{}, me
 
 }
 
-//Memeber profile flexible update
-func (member *Member) MemberProfileFlexibleUpdate(memberProfileData map[string]interface{}, memberId, modifiedBy int,tenantid int) error {
+// Memeber profile flexible update
+func (member *Member) MemberProfileFlexibleUpdate(memberProfileData map[string]interface{}, memberId, modifiedBy int, tenantid int) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return AuthErr
@@ -464,7 +464,7 @@ func (member *Member) MemberProfileFlexibleUpdate(memberProfileData map[string]i
 	currentTime, _ := time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 	memberProfileData["modified_on"] = currentTime
 	memberProfileData["modified_by"] = modifiedBy
-	err := Membermodel.FlexibleMemberProfileUpdate(memberProfileData, memberId, member.DB,tenantid)
+	err := Membermodel.FlexibleMemberProfileUpdate(memberProfileData, memberId, member.DB, tenantid)
 	if err != nil {
 		return err
 	}
@@ -473,34 +473,35 @@ func (member *Member) MemberProfileFlexibleUpdate(memberProfileData map[string]i
 }
 
 // Member password update functionality
-func (member *Member) MemberPasswordUpdate(newPassword, confirmPassword, oldPassword string, memberId, modifiedBy int,tenantid int) error {
+func (member *Member) MemberPasswordUpdate(newPassword, confirmPassword, oldPassword string, memberId, modifiedBy int, tenantid int) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return AuthErr
 	}
 
 	var memberData TblMember
-	if err := Membermodel.GetMemberDetailsByMemberId(&memberData, memberId, member.DB,tenantid); err != nil {
+	if err := Membermodel.GetMemberDetailsByMemberId(&memberData, memberId, member.DB, tenantid); err != nil {
 		return err
 	}
-
-	if err := bcrypt.CompareHashAndPassword([]byte(memberData.Password), []byte(oldPassword)); err != nil {
-		return err
+	if oldPassword != "" {
+		if err := bcrypt.CompareHashAndPassword([]byte(memberData.Password), []byte(oldPassword)); err != nil {
+			return err
+		}
 	}
-
 	if newPassword != confirmPassword {
 		return ErrorPassMissMatch
 	}
 
 	hash_pass := hashingPassword(confirmPassword)
-	if err := bcrypt.CompareHashAndPassword([]byte(hash_pass), []byte(oldPassword)); err != nil {
-		return err
+	if oldPassword != "" {
+		if err := bcrypt.CompareHashAndPassword([]byte(hash_pass), []byte(oldPassword)); err != nil {
+			return err
+		}
 	}
-
 	memberData.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 	memberData.ModifiedBy = modifiedBy
 	memberData.Password = hash_pass
-	err := Membermodel.MemberPasswordUpdate(memberData, memberId, member.DB,tenantid)
+	err := Membermodel.MemberPasswordUpdate(memberData, memberId, member.DB, tenantid)
 	if err != nil {
 		return err
 	}
@@ -516,7 +517,7 @@ func (member *Member) GetMemberSettings(tenantid int) (TblMemberSetting, error) 
 		return TblMemberSetting{}, AuthErr
 	}
 
-	membersetttings, err := Membermodel.GetMemberSettings(member.DB,tenantid)
+	membersetttings, err := Membermodel.GetMemberSettings(member.DB, tenantid)
 
 	if err != nil {
 		return TblMemberSetting{}, err
@@ -539,7 +540,7 @@ func (member *Member) SetMemberSettings(membersett MemberSettings, tenantid int)
 	updatedetails["modified_by"] = membersett.ModifiedBy
 	updatedetails["modified_on"], _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 
-	if err := Membermodel.UpdateMemberSetting(updatedetails, member.DB,tenantid); err != nil {
+	if err := Membermodel.UpdateMemberSetting(updatedetails, member.DB, tenantid); err != nil {
 		return err
 	}
 
