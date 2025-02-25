@@ -483,21 +483,20 @@ func (member *Member) MemberPasswordUpdate(newPassword, confirmPassword, oldPass
 	if err := Membermodel.GetMemberDetailsByMemberId(&memberData, memberId, member.DB, tenantid); err != nil {
 		return err
 	}
-	if oldPassword != "" {
-		if err := bcrypt.CompareHashAndPassword([]byte(memberData.Password), []byte(oldPassword)); err != nil {
-			return err
-		}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(memberData.Password), []byte(oldPassword)); err != nil {
+		return err
 	}
+
 	if newPassword != confirmPassword {
 		return ErrorPassMissMatch
 	}
 
 	hash_pass := hashingPassword(confirmPassword)
-	if oldPassword != "" {
-		if err := bcrypt.CompareHashAndPassword([]byte(hash_pass), []byte(oldPassword)); err != nil {
-			return err
-		}
+	if err := bcrypt.CompareHashAndPassword([]byte(hash_pass), []byte(oldPassword)); err != nil {
+		return err
 	}
+
 	memberData.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 	memberData.ModifiedBy = modifiedBy
 	memberData.Password = hash_pass
@@ -545,4 +544,161 @@ func (member *Member) SetMemberSettings(membersett MemberSettings, tenantid int)
 	}
 
 	return nil
+}
+
+// membership levels-------------------
+
+func (memsership *Member) MembershipGroupList() []TblMstrMembergrouplevel {
+
+	list, _ := Membermodel.GetMembershipGroup(memsership.DB)
+
+	return list
+
+}
+
+func (membership *Member) MembershipGroupLevelCreate(namae string, desc string, is_active int, tenantid int, userid int) {
+
+	// createdOnStr := time.Now().UTC().Format("2006-01-02 15:04:05")
+
+	t, _ := time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	groupdata := TblMstrMembergrouplevel{
+		GroupName:   namae,
+		Description: desc,
+		TenantId:    tenantid,
+		Slug:        strings.ToLower(namae),
+		IsActive:    is_active,
+		CreatedOn:   t,
+		CreatedBy:   userid,
+	}
+
+	Membermodel.CreateMembershipGrouplevel(groupdata, membership.DB)
+
+}
+
+func (membership *Member) MembershipGrupUpdate(namae string, desc string, is_active int, tenantid int, userid int, id int) {
+
+	t, _ := time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	Groupupdate := TblMstrMembergrouplevel{
+		Id:          id,
+		GroupName:   namae,
+		Description: desc,
+		TenantId:    tenantid,
+		Slug:        strings.ToLower(namae),
+		IsActive:    is_active,
+		ModifiedOn:  t,
+		ModifiedBy:  userid,
+	}
+
+	Membermodel.UpdatemembershipGroup(Groupupdate, tenantid, membership.DB)
+
+}
+
+func (Membership *Member) MembershipGroupDelete(id int, userid int, tenantid int) {
+	t, _ := time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	Groupupdate := TblMstrMembergrouplevel{
+		Id:        id,
+		DeletedOn: t,
+		DeletedBy: userid,
+		TenantId:  tenantid,
+	}
+	Membermodel.DeleteMembershipgroup(Groupupdate, Membership.DB)
+}
+
+func (Membership *Member) MembershipLevelsList() []TblMstrMembershiplevel {
+
+	var subscriptionlist []TblMstrMembershiplevel
+
+	Membermodel.GetMembershipLevel(&subscriptionlist, Membership.DB)
+
+	return subscriptionlist
+
+}
+
+func (Membership *Member) MembershipLevelsCreate(sd TblMstrMembershiplevel, tenantid int) {
+
+	t, _ := time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	var subscriptiondata TblMstrMembershiplevel
+
+	subscriptiondata.SubscriptionName = sd.SubscriptionName
+	subscriptiondata.Description = sd.Description
+	subscriptiondata.MembergroupLevelId = sd.MembergroupLevelId
+	subscriptiondata.InitialPayment = sd.InitialPayment
+	subscriptiondata.RecurrentSubscription = sd.RecurrentSubscription
+	subscriptiondata.BillingAmount = sd.BillingAmount
+	subscriptiondata.BillingfrequentValue = sd.BillingfrequentValue
+	subscriptiondata.BillingfrequentType = sd.BillingfrequentType
+	subscriptiondata.CustomTrial = sd.CustomTrial
+	subscriptiondata.TrialBillingAmount = sd.TrialBillingAmount
+	subscriptiondata.TrialBillingLimit = sd.TrialBillingLimit
+	subscriptiondata.CreatedOn = t
+	subscriptiondata.TenantId = tenantid
+	subscriptiondata.IsActive = sd.IsActive
+
+	Membermodel.CreateSubscriptionLevel(subscriptiondata, Membership.DB)
+
+}
+
+func (Membership *Member) UpdateSubscription(subscriptionNewdata TblMstrMembershiplevel, tenantid int) {
+
+	time, _ := time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	var Updatesubscription TblMstrMembershiplevel
+	Updatesubscription.Id = subscriptionNewdata.Id
+	Updatesubscription.SubscriptionName = subscriptionNewdata.SubscriptionName
+	Updatesubscription.Description = subscriptionNewdata.Description
+	Updatesubscription.MembergroupLevelId = subscriptionNewdata.MembergroupLevelId
+	Updatesubscription.InitialPayment = subscriptionNewdata.InitialPayment
+	Updatesubscription.RecurrentSubscription = subscriptionNewdata.RecurrentSubscription
+	Updatesubscription.BillingAmount = subscriptionNewdata.BillingAmount
+	Updatesubscription.BillingfrequentValue = subscriptionNewdata.BillingfrequentValue
+	Updatesubscription.BillingfrequentType = subscriptionNewdata.BillingfrequentType
+	Updatesubscription.BillingCyclelimit = subscriptionNewdata.BillingCyclelimit
+	Updatesubscription.CustomTrial = subscriptionNewdata.CustomTrial
+	Updatesubscription.ModifiedBy = subscriptionNewdata.ModifiedBy
+	Updatesubscription.TrialBillingAmount = subscriptionNewdata.TrialBillingAmount
+	Updatesubscription.TrialBillingLimit = subscriptionNewdata.TrialBillingLimit
+	Updatesubscription.IsActive = subscriptionNewdata.IsActive
+	Updatesubscription.ModifiedOn = time
+
+	Membermodel.Subscriptionupdate(Updatesubscription, tenantid, Membership.DB)
+
+}
+
+func (Membership *Member) SubscriptionDelete(tenantid int, id int, userid int) {
+
+	var subscriptionlist TblMstrMembershiplevel
+
+	time, _ := time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	subscriptionlist.DeletedOn = time
+	subscriptionlist.DeletedBy = userid
+	subscriptionlist.TenantId = tenantid
+
+	Membermodel.DeleteSubscription(&subscriptionlist, id, Membership.DB)
+
+}
+
+func (Membership *Member) CreateCheckOut(name string,mail string,pass string,companyname string,position string,tenant int) MemberCheckoutDetails {
+
+	var checkoutdata MemberCheckoutDetails
+	time, _ := time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
+
+	checkoutdata.UserName=name
+	checkoutdata.EmailId=mail
+	checkoutdata.Password=pass
+	checkoutdata.CompanyName=companyname
+	checkoutdata.Position=position
+	checkoutdata.TenantId=tenant
+	checkoutdata.CreatedOn=time
+	
+
+
+	Membermodel.CheckoutCreate(&checkoutdata, Membership.DB)
+
+	return checkoutdata
+
 }
