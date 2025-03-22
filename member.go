@@ -26,7 +26,7 @@ func MemberSetup(config Config) *Member {
 }
 
 // list member
-func (member *Member) ListMembers(offset int, limit int, filter Filter, flag bool, TenantId int) (memb []Tblmember, totoalmember int64, err error) {
+func (member *Member) ListMembers(offset int, limit int, filter Filter, flag bool, TenantId string) (memb []Tblmember, totoalmember int64, err error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -107,7 +107,7 @@ func (member *Member) CreateMember(Mc MemberCreationUpdation) (Tblmember, error)
 }
 
 // Update Member
-func (member *Member) UpdateMember(Mc MemberCreationUpdation, id int, tenantid int) error {
+func (member *Member) UpdateMember(Mc MemberCreationUpdation, id int, tenantid string) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return AuthErr
@@ -178,7 +178,7 @@ func (member *Member) CreateMemberProfile(Mc MemberprofilecreationUpdation) erro
 }
 
 // update memberprofile
-func (member *Member) UpdateMemberProfile(Mc MemberprofilecreationUpdation, tenantid int) error {
+func (member *Member) UpdateMemberProfile(Mc MemberprofilecreationUpdation, tenantid string) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -217,7 +217,7 @@ func (member *Member) UpdateMemberProfile(Mc MemberprofilecreationUpdation, tena
 }
 
 // delete member
-func (member *Member) DeleteMember(id int, modifiedBy int, tenantid int) error {
+func (member *Member) DeleteMember(id int, modifiedBy int, tenantid string) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -242,7 +242,7 @@ func (member *Member) DeleteMember(id int, modifiedBy int, tenantid int) error {
 }
 
 // Get member data
-func (member *Member) GetMemberDetails(id int, tenantid int) (members Tblmember, err error) {
+func (member *Member) GetMemberDetails(id int, tenantid string) (members Tblmember, err error) {
 
 	var memberdata Tblmember
 
@@ -257,7 +257,7 @@ func (member *Member) GetMemberDetails(id int, tenantid int) (members Tblmember,
 }
 
 // Get memberprofile data
-func (member *Member) GetMemberProfileByMemberId(memberid int, tenantid int) (memberprofs TblMemberProfile, err error) {
+func (member *Member) GetMemberProfileByMemberId(memberid int, tenantid string) (memberprofs TblMemberProfile, err error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -276,7 +276,7 @@ func (member *Member) GetMemberProfileByMemberId(memberid int, tenantid int) (me
 }
 
 // Check Number is already exits or not
-func (member *Member) CheckProfileSlugInMember(id int, number string, tenantid int) (bool, error) {
+func (member *Member) CheckProfileSlugInMember(id int, number string, tenantid string) (bool, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -293,7 +293,7 @@ func (member *Member) CheckProfileSlugInMember(id int, number string, tenantid i
 }
 
 // member is_active
-func (member *Member) MemberStatus(memberid int, status int, modifiedby int, tenantid int) (bool, error) {
+func (member *Member) MemberStatus(memberid int, status int, modifiedby int, tenantid string) (bool, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return false, AuthErr
@@ -313,7 +313,7 @@ func (member *Member) MemberStatus(memberid int, status int, modifiedby int, ten
 }
 
 // multiselecte member delete
-func (member *Member) MultiSelectedMemberDelete(Memberid []int, modifiedby int, tenantid int) (bool, error) {
+func (member *Member) MultiSelectedMemberDelete(Memberid []int, modifiedby int, tenantid string) (bool, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return false, AuthErr
@@ -334,7 +334,7 @@ func (member *Member) MultiSelectedMemberDelete(Memberid []int, modifiedby int, 
 }
 
 // multiselecte member status change
-func (member *Member) MultiSelectMembersStatus(memberid []int, status int, modifiedby int, tenantid int) (bool, error) {
+func (member *Member) MultiSelectMembersStatus(memberid []int, status int, modifiedby int, tenantid string) (bool, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -355,7 +355,7 @@ func (member *Member) MultiSelectMembersStatus(memberid []int, status int, modif
 
 }
 
-func (member *Member) CheckProfileSlug(profileSlug string, profileID int, tenantid int) (TblMemberProfile, error) {
+func (member *Member) CheckProfileSlug(profileSlug string, profileID int, tenantid string) (TblMemberProfile, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -377,7 +377,7 @@ func (member *Member) CheckProfileSlug(profileSlug string, profileID int, tenant
 	return TblMemberProfile{}, nil
 }
 
-func (member *Member) GetMemberAndProfileData(memberId int, emailid string, profileId int, profileSlug string, tenantid int) (Tblmember, error) {
+func (member *Member) GetMemberAndProfileData(memberId int, emailid string, profileId int, profileSlug string, tenantid string) (Tblmember, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return Tblmember{}, AuthErr
@@ -391,7 +391,7 @@ func (member *Member) GetMemberAndProfileData(memberId int, emailid string, prof
 	return profile, nil
 }
 
-func (member *Member) DashboardMemberCount(tenantid int) (totalcount int, lasttendayscount int, err error) {
+func (member *Member) DashboardMemberCount(tenantid string) (totalcount int, lasttendayscount int, err error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return 0, 0, AuthErr
@@ -411,7 +411,7 @@ func (member *Member) DashboardMemberCount(tenantid int) (totalcount int, lastte
 }
 
 // Active MemberList Function//
-func (member *Member) ActiveMemberList(limit int, tenantid int) (memberdata []Tblmember, err error) {
+func (member *Member) ActiveMemberList(limit int, tenantid string) (memberdata []Tblmember, err error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 
@@ -436,7 +436,7 @@ func (member *Member) ActiveMemberList(limit int, tenantid int) (memberdata []Tb
 }
 
 // Member flexible update functionality
-func (member *Member) MemberFlexibleUpdate(memberData map[string]interface{}, memberId, modifiedBy int, tenantid int) error {
+func (member *Member) MemberFlexibleUpdate(memberData map[string]interface{}, memberId, modifiedBy int, tenantid string) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return AuthErr
@@ -455,7 +455,7 @@ func (member *Member) MemberFlexibleUpdate(memberData map[string]interface{}, me
 }
 
 // Memeber profile flexible update
-func (member *Member) MemberProfileFlexibleUpdate(memberProfileData map[string]interface{}, memberId, modifiedBy int, tenantid int) error {
+func (member *Member) MemberProfileFlexibleUpdate(memberProfileData map[string]interface{}, memberId, modifiedBy int, tenantid string) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return AuthErr
@@ -473,7 +473,7 @@ func (member *Member) MemberProfileFlexibleUpdate(memberProfileData map[string]i
 }
 
 // Member password update functionality
-func (member *Member) MemberPasswordUpdate(newPassword, confirmPassword, oldPassword string, memberId, modifiedBy int, tenantid int) error {
+func (member *Member) MemberPasswordUpdate(newPassword, confirmPassword, oldPassword string, memberId, modifiedBy int, tenantid string) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return AuthErr
@@ -510,7 +510,7 @@ func (member *Member) MemberPasswordUpdate(newPassword, confirmPassword, oldPass
 }
 
 // Get member settings
-func (member *Member) GetMemberSettings(tenantid int) (TblMemberSetting, error) {
+func (member *Member) GetMemberSettings(tenantid string) (TblMemberSetting, error) {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return TblMemberSetting{}, AuthErr
@@ -526,7 +526,7 @@ func (member *Member) GetMemberSettings(tenantid int) (TblMemberSetting, error) 
 }
 
 // set member settings
-func (member *Member) SetMemberSettings(membersett MemberSettings, tenantid int) error {
+func (member *Member) SetMemberSettings(membersett MemberSettings, tenantid string) error {
 
 	if AuthErr := AuthandPermission(member); AuthErr != nil {
 		return AuthErr
@@ -556,7 +556,7 @@ func (memsership *Member) MembershipGroupList() []TblMstrMembergrouplevel {
 
 }
 
-func (membership *Member) MembershipGroupLevelCreate(namae string, desc string, is_active int, tenantid int, userid int) {
+func (membership *Member) MembershipGroupLevelCreate(namae string, desc string, is_active int, tenantid string, userid int) {
 
 	// createdOnStr := time.Now().UTC().Format("2006-01-02 15:04:05")
 
@@ -576,7 +576,7 @@ func (membership *Member) MembershipGroupLevelCreate(namae string, desc string, 
 
 }
 
-func (membership *Member) MembershipGrupUpdate(namae string, desc string, is_active int, tenantid int, userid int, id int) {
+func (membership *Member) MembershipGrupUpdate(namae string, desc string, is_active int, tenantid string, userid int, id int) {
 
 	t, _ := time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 
@@ -595,7 +595,7 @@ func (membership *Member) MembershipGrupUpdate(namae string, desc string, is_act
 
 }
 
-func (Membership *Member) MembershipGroupDelete(id int, userid int, tenantid int) {
+func (Membership *Member) MembershipGroupDelete(id int, userid int, tenantid string) {
 	t, _ := time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 
 	Groupupdate := TblMstrMembergrouplevel{
@@ -617,7 +617,7 @@ func (Membership *Member) MembershipLevelsList() []TblMstrMembershiplevel {
 
 }
 
-func (Membership *Member) MembershipLevelsCreate(sd TblMstrMembershiplevel, tenantid int) {
+func (Membership *Member) MembershipLevelsCreate(sd TblMstrMembershiplevel, tenantid string) {
 
 	t, _ := time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 
@@ -642,7 +642,7 @@ func (Membership *Member) MembershipLevelsCreate(sd TblMstrMembershiplevel, tena
 
 }
 
-func (Membership *Member) UpdateSubscription(subscriptionNewdata TblMstrMembershiplevel, tenantid int) {
+func (Membership *Member) UpdateSubscription(subscriptionNewdata TblMstrMembershiplevel, tenantid string) {
 
 	time, _ := time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 
@@ -668,7 +668,7 @@ func (Membership *Member) UpdateSubscription(subscriptionNewdata TblMstrMembersh
 
 }
 
-func (Membership *Member) SubscriptionDelete(tenantid int, id int, userid int) {
+func (Membership *Member) SubscriptionDelete(tenantid string, id int, userid int) {
 
 	var subscriptionlist TblMstrMembershiplevel
 
@@ -682,23 +682,4 @@ func (Membership *Member) SubscriptionDelete(tenantid int, id int, userid int) {
 
 }
 
-func (Membership *Member) CreateCheckOut(name string,mail string,pass string,companyname string,position string,tenant int) MemberCheckoutDetails {
 
-	var checkoutdata MemberCheckoutDetails
-	time, _ := time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
-
-	checkoutdata.UserName=name
-	checkoutdata.EmailId=mail
-	checkoutdata.Password=pass
-	checkoutdata.CompanyName=companyname
-	checkoutdata.Position=position
-	checkoutdata.TenantId=tenant
-	checkoutdata.CreatedOn=time
-	
-
-
-	Membermodel.CheckoutCreate(&checkoutdata, Membership.DB)
-
-	return checkoutdata
-
-}

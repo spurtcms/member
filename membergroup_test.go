@@ -49,12 +49,12 @@ func TestListMemberGroup(t *testing.T) {
 	db, _ := DBSetup()
 
 	config := auth.Config{
-		UserId:     1,
+		UserId: 1,
 		// ExpiryTime: 2,
-		ExpiryFlg:  false,
-		SecretKey:  "Secret123",
-		DB:         db,
-		RoleId:     1,
+		ExpiryFlg: false,
+		SecretKey: "Secret123",
+		DB:        db,
+		RoleId:    1,
 	}
 
 	Auth := auth.AuthSetup(config)
@@ -63,7 +63,7 @@ func TestListMemberGroup(t *testing.T) {
 
 	Auth.VerifyToken(token, SecretKey)
 
-	permisison, _ := Auth.IsGranted("Members Group", auth.CRUD, 1)
+	permisison, _ := Auth.IsGranted("Members Group", auth.CRUD, "1")
 
 	member := MemberSetup(Config{
 		DB:               db,
@@ -73,7 +73,7 @@ func TestListMemberGroup(t *testing.T) {
 	})
 	if permisison {
 
-		membergroup, count, err := member.ListMemberGroup(MemberGroupListReq{Limit: 10, Offset: 0}, 1)
+		membergroup, count, err := member.ListMemberGroup(MemberGroupListReq{Limit: 10, Offset: 0}, "1")
 
 		if err != nil {
 
@@ -95,12 +95,12 @@ func TestCreateMemberGroup(t *testing.T) {
 	db, _ := DBSetup()
 
 	config := auth.Config{
-		UserId:     1,
+		UserId: 1,
 		// ExpiryTime: 2,
-		ExpiryFlg:  false,
-		SecretKey:  "Secret123",
-		DB:         db,
-		RoleId:     1,
+		ExpiryFlg: false,
+		SecretKey: "Secret123",
+		DB:        db,
+		RoleId:    1,
 	}
 
 	Auth := auth.AuthSetup(config)
@@ -109,7 +109,7 @@ func TestCreateMemberGroup(t *testing.T) {
 
 	Auth.VerifyToken(token, SecretKey)
 
-	permisison, _ := Auth.IsGranted("Members Group", auth.CRUD, 1)
+	permisison, _ := Auth.IsGranted("Members Group", auth.CRUD, "1")
 
 	member := MemberSetup(Config{
 		DB:               db,
@@ -119,7 +119,7 @@ func TestCreateMemberGroup(t *testing.T) {
 	})
 	if permisison {
 
-		err := member.CreateMemberGroup(MemberGroupCreation{"sports", "indian team", 1}, 1)
+		err := member.CreateMemberGroup(MemberGroupCreation{"sports", "indian team", 1}, "1")
 
 		if err != nil {
 
@@ -135,8 +135,6 @@ func TestCreateMemberGroup(t *testing.T) {
 
 }
 
-
-
 // test createmembergroup function
 func TestUpdateMemberGroup(t *testing.T) {
 
@@ -148,14 +146,14 @@ func TestUpdateMemberGroup(t *testing.T) {
 		PermissionEnable: false,
 	})
 
-		err := member.UpdateMemberGroup(MemberGroupCreationUpdation{Name:"Default",Description: "default group2",ModifiedBy: 1,IsActive: 1},2,1)
+	err := member.UpdateMemberGroup(MemberGroupCreationUpdation{Name: "Default", Description: "default group2", ModifiedBy: 1, IsActive: 1}, 2, "1")
 
-		if err != nil {
+	if err != nil {
 
-			panic(err)
-		}
+		panic(err)
+	}
 
-		fmt.Println(err)
+	fmt.Println(err)
 
 }
 
@@ -170,14 +168,13 @@ func TestDeleteMemberGroup(t *testing.T) {
 		PermissionEnable: false,
 	})
 
-		err := member.DeleteMemberGroup(2,1,1)
+	err := member.DeleteMemberGroup(2, 1, "1")
 
-		if err != nil {
+	if err != nil {
 
-			panic(err)
-		}
+		panic(err)
+	}
 
-		fmt.Println(err)
+	fmt.Println(err)
 
 }
-

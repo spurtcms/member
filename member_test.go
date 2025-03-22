@@ -28,7 +28,7 @@ func TestListMembers(t *testing.T) {
 
 	Auth.VerifyToken(token, SecretKey)
 
-	permisison, _ := Auth.IsGranted("Members", auth.CRUD, 1)
+	permisison, _ := Auth.IsGranted("Members", auth.CRUD, "1")
 
 	member := MemberSetup(Config{
 		DB:               db,
@@ -38,7 +38,7 @@ func TestListMembers(t *testing.T) {
 	})
 	if permisison {
 
-		memberlist, count, err := member.ListMembers(0, 10, Filter{}, false,1)
+		memberlist, count, err := member.ListMembers(0, 10, Filter{}, false, "1")
 
 		if err != nil {
 
@@ -74,7 +74,7 @@ func TestCreateMember(t *testing.T) {
 
 	Auth.VerifyToken(token, SecretKey)
 
-	permisison, _ := Auth.IsGranted("Members", auth.CRUD, 1)
+	permisison, _ := Auth.IsGranted("Members", auth.CRUD, "1")
 
 	member := MemberSetup(Config{
 		DB:               db,
@@ -84,7 +84,7 @@ func TestCreateMember(t *testing.T) {
 	})
 	if permisison {
 
-		memberdata, err := member.CreateMember(MemberCreationUpdation{FirstName: "tester", Username: "Tester", Email: "tester@gmail.com", MobileNo: "9080706050", Password: "Tester@123", TenantId: 1})
+		memberdata, err := member.CreateMember(MemberCreationUpdation{FirstName: "tester", Username: "Tester", Email: "tester@gmail.com", MobileNo: "9080706050", Password: "Tester@123", TenantId: "1"})
 
 		if err != nil {
 
@@ -106,12 +106,12 @@ func TestUpdateMember(t *testing.T) {
 	db, _ := DBSetup()
 
 	config := auth.Config{
-		UserId:     1,
+		UserId: 1,
 		// ExpiryTime: 2,
-		ExpiryFlg:  false,
-		SecretKey:  "Secret123",
-		DB:         db,
-		RoleId:     1,
+		ExpiryFlg: false,
+		SecretKey: "Secret123",
+		DB:        db,
+		RoleId:    1,
 	}
 
 	Auth := auth.AuthSetup(config)
@@ -130,7 +130,7 @@ func TestUpdateMember(t *testing.T) {
 	})
 	if permisison {
 
-		err := member.UpdateMember(MemberCreationUpdation{FirstName: "testers", Username: "Testers", Email: "testers@gmail.com", MobileNo: "9080706050", Password: "Testers@123"}, 1, 1)
+		err := member.UpdateMember(MemberCreationUpdation{FirstName: "testers", Username: "Testers", Email: "testers@gmail.com", MobileNo: "9080706050", Password: "Testers@123"}, 1, "1")
 
 		if err != nil {
 
@@ -152,12 +152,12 @@ func TestCreateMemberProfile(t *testing.T) {
 	db, _ := DBSetup()
 
 	config := auth.Config{
-		UserId:     1,
+		UserId: 1,
 		// ExpiryTime: 2,
-		ExpiryFlg:  false,
-		SecretKey:  "Secret123",
-		DB:         db,
-		RoleId:     1,
+		ExpiryFlg: false,
+		SecretKey: "Secret123",
+		DB:        db,
+		RoleId:    1,
 	}
 
 	Auth := auth.AuthSetup(config)
@@ -176,7 +176,7 @@ func TestCreateMemberProfile(t *testing.T) {
 	})
 	if permisison {
 
-		err := member.CreateMemberProfile(MemberprofilecreationUpdation{MemberId: 1, ProfileId: 5, CompanyName: "CMN",TenantId: 1})
+		err := member.CreateMemberProfile(MemberprofilecreationUpdation{MemberId: 1, ProfileId: 5, CompanyName: "CMN", TenantId: "1"})
 
 		if err != nil {
 
@@ -198,12 +198,12 @@ func TestUpdateMemberProfile(t *testing.T) {
 	db, _ := DBSetup()
 
 	config := auth.Config{
-		UserId:     1,
+		UserId: 1,
 		// ExpiryTime: 2,
-		ExpiryFlg:  false,
-		SecretKey:  "Secret123",
-		DB:         db,
-		RoleId:     1,
+		ExpiryFlg: false,
+		SecretKey: "Secret123",
+		DB:        db,
+		RoleId:    1,
 	}
 
 	Auth := auth.AuthSetup(config)
@@ -222,7 +222,7 @@ func TestUpdateMemberProfile(t *testing.T) {
 	})
 	if permisison {
 
-		err := member.UpdateMemberProfile(MemberprofilecreationUpdation{ProfileId: 1, CompanyName: "CMNs"}, 1)
+		err := member.UpdateMemberProfile(MemberprofilecreationUpdation{ProfileId: 1, CompanyName: "CMNs"}, "1")
 
 		if err != nil {
 
@@ -244,12 +244,12 @@ func TestDeleteMember(t *testing.T) {
 	db, _ := DBSetup()
 
 	config := auth.Config{
-		UserId:     1,
+		UserId: 1,
 		// ExpiryTime: 2,
-		ExpiryFlg:  false,
-		SecretKey:  "Secret123",
-		DB:         db,
-		RoleId:     1,
+		ExpiryFlg: false,
+		SecretKey: "Secret123",
+		DB:        db,
+		RoleId:    1,
 	}
 
 	Auth := auth.AuthSetup(config)
@@ -268,7 +268,7 @@ func TestDeleteMember(t *testing.T) {
 	})
 	if permisison {
 
-		err := member.DeleteMember(1, 1, 1)
+		err := member.DeleteMember(1, 1, "1")
 
 		if err != nil {
 
