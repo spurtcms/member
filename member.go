@@ -4,8 +4,6 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/crypto/bcrypt"
-
 	"github.com/google/uuid"
 	"github.com/spurtcms/member/migration"
 )
@@ -484,18 +482,18 @@ func (member *Member) MemberPasswordUpdate(newPassword, confirmPassword, oldPass
 		return err
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(memberData.Password), []byte(oldPassword)); err != nil {
-		return err
-	}
+	// if err := bcrypt.CompareHashAndPassword([]byte(memberData.Password), []byte(oldPassword)); err != nil {
+	// 	return err
+	// }
 
 	if newPassword != confirmPassword {
 		return ErrorPassMissMatch
 	}
 
 	hash_pass := hashingPassword(confirmPassword)
-	if err := bcrypt.CompareHashAndPassword([]byte(hash_pass), []byte(oldPassword)); err != nil {
-		return err
-	}
+	// if err := bcrypt.CompareHashAndPassword([]byte(hash_pass), []byte(oldPassword)); err != nil {
+	// 	return err
+	// }
 
 	memberData.ModifiedOn, _ = time.Parse("2006-01-02 15:04:05", time.Now().UTC().Format("2006-01-02 15:04:05"))
 	memberData.ModifiedBy = modifiedBy
@@ -681,5 +679,3 @@ func (Membership *Member) SubscriptionDelete(tenantid string, id int, userid int
 	Membermodel.DeleteSubscription(&subscriptionlist, id, Membership.DB)
 
 }
-
-
