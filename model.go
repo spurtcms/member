@@ -415,10 +415,21 @@ func (membermodel MemberModel) UpdateMember(member *Tblmember, DB *gorm.DB, tena
 
 	query := DB.Table("tbl_members").Where("id=? and tenant_id=?", member.Id, tenantid)
 
-	if member.Password == "" && member.ProfileImage == "" && member.ProfileImagePath == "" {
+	if member.Password == "" || member.ProfileImage == "" {
 
-		query.Omit("password , profile_image , profile_image_path").UpdateColumns(map[string]interface{}{"first_name": member.FirstName, "last_name": member.LastName, "member_group_id": member.MemberGroupId, "email": member.Email, "username": member.Username, "mobile_no": member.MobileNo, "is_active": member.IsActive, "modified_on": member.ModifiedOn, "modified_by": member.ModifiedBy})
+		if member.Password == "" && member.ProfileImage == "" {
 
+			query.Omit("password , profile_image , profile_image_path").UpdateColumns(map[string]interface{}{"first_name": member.FirstName, "last_name": member.LastName, "member_group_id": member.MemberGroupId, "email": member.Email, "username": member.Username, "mobile_no": member.MobileNo, "is_active": member.IsActive, "modified_on": member.ModifiedOn, "modified_by": member.ModifiedBy})
+
+		} else if member.ProfileImage == "" {
+
+			query.Omit(" profile_image , profile_image_path").UpdateColumns(map[string]interface{}{"first_name": member.FirstName, "last_name": member.LastName, "member_group_id": member.MemberGroupId, "email": member.Email, "username": member.Username, "mobile_no": member.MobileNo, "is_active": member.IsActive, "modified_on": member.ModifiedOn, "modified_by": member.ModifiedBy, "password": member.Password})
+
+		} else if member.Password == "" {
+
+			query.Omit("password").UpdateColumns(map[string]interface{}{"first_name": member.FirstName, "last_name": member.LastName, "member_group_id": member.MemberGroupId, "email": member.Email, "username": member.Username, "mobile_no": member.MobileNo, "is_active": member.IsActive, "modified_on": member.ModifiedOn, "modified_by": member.ModifiedBy, "profile_image": member.ProfileImage, "profile_image_path": member.ProfileImagePath})
+
+		}
 	} else {
 
 		query.UpdateColumns(map[string]interface{}{"first_name": member.FirstName, "last_name": member.LastName, "member_group_id": member.MemberGroupId, "email": member.Email, "username": member.Username, "mobile_no": member.MobileNo, "is_active": member.IsActive, "modified_on": member.ModifiedOn, "modified_by": member.ModifiedBy, "profile_image": member.ProfileImage, "profile_image_path": member.ProfileImagePath, "password": member.Password, "storage_type": member.StorageType})
@@ -490,13 +501,13 @@ func (membermodel MemberModel) CheckNumberInMember(member *TblMember, number str
 
 	if userid == 0 {
 
-		if err := DB.Table("tbl_members").Where("mobile_no = ? and tenant_id=? and is_deleted = 0", number, tenantid).First(&member).Error; err != nil {
+		if err := DB.Debug().Table("tbl_members").Where("mobile_no = ? and tenant_id=? and is_deleted = 0", number, tenantid).First(&member).Error; err != nil {
 
 			return err
 		}
 	} else {
 
-		if err := DB.Table("tbl_members").Where("mobile_no = ? and id not in (?) and tenant_id=? and is_deleted=0", number, userid, tenantid).First(&member).Error; err != nil {
+		if err := DB.Debug().Table("tbl_members").Where("mobile_no = ? and id not in (?) and tenant_id=? and is_deleted=0", number, userid, tenantid).First(&member).Error; err != nil {
 
 			return err
 		}
@@ -719,7 +730,7 @@ func (membermodel MemberModel) CheckProfileSlug(profileSlug string, DB *gorm.DB,
 
 func (membermodel MemberModel) GetMemberProfile(memberId int, emailid string, profileId int, profileSlug string, DB *gorm.DB, tenantid string) (tblmember Tblmember, err error) {
 
-	query := DB.Table("tbl_members").Preload("TblMemberProfile")
+	query := DB.Debug().Table("tbl_members").Preload("TblMemberProfile")
 
 	if memberId != 0 {
 
@@ -780,7 +791,7 @@ func (membermodel MemberModel) ActiveMemberList(member []Tblmember, limit int, D
 
 func (membermodel MemberModel) FlexibleMemberUpdate(memberData map[string]interface{}, memberid int, DB *gorm.DB, tenantid string) error {
 
-	if err := DB.Table("tbl_members").Where("is_deleted = 0 and id = ? and tenant_id=?", memberid, tenantid).UpdateColumns(memberData).Error; err != nil {
+	if err := DB.Table("tbl_members").Debug().Where("is_deleted = 0 and id = ? and tenant_id=?", memberid, tenantid).UpdateColumns(memberData).Error; err != nil {
 
 		return err
 	}
