@@ -587,7 +587,7 @@ func (membermodel MemberModel) GetMemberDetailsByMemberId(MemberDetails *TblMemb
 // Get Member Details
 func (membermodel MemberModel) MemberDetails(member *Tblmember, memberid int, DB *gorm.DB, tenantid string) error {
 
-	if err := DB.Table("tbl_members").Select("tbl_members.*,tbl_member_groups.name as group_name").Joins("left join tbl_member_groups on tbl_member_groups.id = tbl_members.member_group_id").Where("tbl_members.id=? and tbl_members.tenant_id=?", memberid, tenantid).First(&member).Error; err != nil {
+	if err := DB.Table("tbl_members").Select("tbl_members.*,tbl_member_groups.name as group_name").Joins("left join tbl_member_groups on tbl_member_groups.id = tbl_members.member_group_id").Where("tbl_members.id=? and tbl_members.tenant_id=? and tbl_members.is_deleted=0", memberid, tenantid).First(&member).Error; err != nil {
 		return err
 
 	}
