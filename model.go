@@ -573,6 +573,22 @@ func (membermodel MemberModel) GetGroupData(membergroup []Tblmembergroup, DB *go
 
 }
 
+// get member group
+func (membermodel MemberModel) GetGroupDataid(membergroup Tblmembergroup, DB *gorm.DB, tenantid string,name string) (membergrouplists Tblmembergroup, err error) {
+ 
+    var membergrouplist Tblmembergroup
+ 
+    if err := DB.Table("tbl_member_groups").Where("is_deleted = 0 and is_active = 1 and tenant_id=? and name=?", tenantid,name).First(&membergrouplist).Error; err != nil {
+ 
+        return Tblmembergroup{}, err
+ 
+    }
+ 
+    return membergrouplist, nil
+ 
+}
+ 
+
 // get member details
 func (membermodel MemberModel) GetMemberDetailsByMemberId(MemberDetails *TblMember, memberId int, DB *gorm.DB, tenantid string) error {
 

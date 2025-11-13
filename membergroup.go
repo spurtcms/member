@@ -176,6 +176,18 @@ func (member *Member) GetGroupData(tenantid string) (membergroup []Tblmembergrou
 
 }
 
+// Get User id for mrmber group
+ 
+func (member *Member) GetGroupDataid(tenantid string, name string) (membergroup Tblmembergroup, err error) {
+ 
+    var memgroup Tblmembergroup
+ 
+    membergrouplist, _ := Membermodel.GetGroupDataid(memgroup, member.DB, tenantid, name)
+ 
+    return membergrouplist, nil
+ 
+}
+
 // member group is_active
 func (member *Member) MemberGroupIsActive(memberid int, status int, modifiedby int, tenantid string) (bool, error) {
 
